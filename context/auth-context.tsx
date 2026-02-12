@@ -58,6 +58,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 fetchCredits(session.user.id);
             }
             setLoading(false);
+        }).catch((err) => {
+            console.error("Supabase Session Error:", err);
+            setLoading(false); // Ensure loading stops even on error
         });
 
         // Listen for changes
