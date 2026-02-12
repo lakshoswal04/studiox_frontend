@@ -57,7 +57,7 @@ export default function LoginPage() {
     useEffect(() => {
         // Capture redirect params once on mount
         const params = new URLSearchParams(window.location.search);
-        redirectPath.current = params.get('redirect') || "/";
+        redirectPath.current = params.get('redirect') || "/onboarding";
     }, []);
 
     useEffect(() => {

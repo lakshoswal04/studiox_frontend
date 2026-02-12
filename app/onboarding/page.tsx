@@ -123,13 +123,36 @@ export default function OnboardingPage() {
 
     const canContinue = !!answers[stepData.id] && (Array.isArray(answers[stepData.id]) ? answers[stepData.id].length > 0 : true);
 
-    return (
-        <div className="flex h-screen w-full bg-[#050505] text-white overflow-hidden font-sans selection:bg-[#ccff00]/30 selection:text-[#ccff00]">
-            {/* Left Panel - Interaction */}
-            <div className="w-full lg:w-[45%] flex flex-col justify-between p-8 md:p-12 lg:p-20 relative z-20">
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.08,
+                delayChildren: 0.1,
+                ease: "circOut"
+            }
+        },
+        exit: { opacity: 0, transition: { duration: 0.2, ease: "easeIn" } }
+    };
 
-                {/* Header / Nav */}
-                <div className="flex items-center justify-between">
+    const itemVariants = {
+        hidden: { opacity: 0, y: 30, filter: "blur(4px)" },
+        visible: {
+            opacity: 1,
+            y: 0,
+            filter: "blur(0px)",
+            transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] }
+        }
+    };
+
+    return (
+        <div className="flex h-[100dvh] w-full bg-[#050505] text-white overflow-hidden font-sans selection:bg-[#ccff00]/30 selection:text-[#ccff00] flex-col md:flex-row">
+            {/* Left Panel - Interaction */}
+            <div className="w-full md:w-[50%] h-full flex flex-col relative z-20 bg-black/50 backdrop-blur-sm">
+
+                {/* Fixed Header */}
+                <div className="flex-shrink-0 px-6 py-6 md:px-12 md:py-8 lg:px-16 flex items-center justify-between">
                     <div className="flex items-center gap-4">
                         {currentStep > 0 ? (
                             <button
@@ -143,54 +166,52 @@ export default function OnboardingPage() {
                             <div className="w-16" /> // spacer
                         )}
                     </div>
-                    <div className="flex flex-col items-end gap-1">
+                    <div className="flex flex-col items-end gap-1.5">
                         <div className="text-[10px] font-bold tracking-[0.2em] uppercase text-zinc-600">
                             Step {currentStep + 1} / {onboardingSteps.length}
                         </div>
-                        <div className="w-24 h-1 bg-zinc-900 rounded-full overflow-hidden">
+                        <div className="w-24 md:w-32 h-1 bg-zinc-900 rounded-full overflow-hidden">
                             <motion.div
                                 className="h-full bg-[#ccff00]"
                                 initial={{ width: 0 }}
                                 animate={{ width: `${progress}%` }}
-                                transition={{ duration: 0.5, ease: "circOut" }}
+                                transition={{ duration: 0.8, ease: "circOut" }}
                             />
                         </div>
                     </div>
                 </div>
 
-                {/* Question Area */}
-                <div className="flex-1 flex flex-col justify-center py-10">
+                {/* Scrollable Question Area */}
+                <div className="flex-1 overflow-y-auto overflow-x-hidden px-6 md:px-12 lg:px-16 py-4 no-scrollbar flex flex-col justify-center">
                     <AnimatePresence mode="wait" custom={direction}>
                         <motion.div
                             key={currentStep}
                             custom={direction}
-                            initial={{ opacity: 0, x: direction * 50 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: direction * -50 }}
-                            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                            className="space-y-8"
+                            variants={containerVariants}
+                            initial="hidden"
+                            animate="visible"
+                            exit="exit"
+                            className="space-y-8 md:space-y-12 max-w-xl mx-auto w-full"
                         >
-                            <div className="space-y-3">
+                            <div className="space-y-3 md:space-y-4 min-h-[5rem]">
                                 <motion.h1
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: 0.1, duration: 0.5 }}
-                                    className="text-4xl md:text-5xl font-bold tracking-tight leading-[1.1]"
+                                    className="text-2xl sm:text-3xl md:text-5xl font-bold tracking-tight leading-[1.1] text-transparent bg-clip-text bg-gradient-to-br from-white via-white to-zinc-500"
                                 >
-                                    {stepData.question}
+                                    {stepData.question.split("").map((char, index) => (
+                                        <motion.span
+                                            key={index}
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            transition={{ duration: 0.05, delay: index * 0.03 }}
+                                        >
+                                            {char}
+                                        </motion.span>
+                                    ))}
                                 </motion.h1>
-                                <motion.p
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    transition={{ delay: 0.2, duration: 0.5 }}
-                                    className="text-lg text-zinc-400 font-light"
-                                >
-                                    {stepData.subtitle}
-                                </motion.p>
                             </div>
 
                             <div className={cn(
-                                "grid gap-4",
+                                "grid gap-3 md:gap-4",
                                 stepData.options.length > 4 ? "grid-cols-2" : "grid-cols-1"
                             )}>
                                 {stepData.options.map((option, idx) => {
@@ -201,40 +222,52 @@ export default function OnboardingPage() {
                                     return (
                                         <motion.button
                                             key={option.id}
-                                            initial={{ opacity: 0, y: 10 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            transition={{ delay: 0.3 + (idx * 0.1), duration: 0.4 }}
+                                            layout
+                                            variants={itemVariants}
                                             onClick={() => handleOptionSelect(option.id)}
+                                            whileHover={{ scale: 1.02 }}
+                                            whileTap={{ scale: 0.98 }}
                                             className={cn(
-                                                "group relative w-full text-left p-5 rounded-2xl border transition-all duration-300",
+                                                "group relative w-full text-left p-4 rounded-xl border transition-all duration-300 ease-out backdrop-blur-md overflow-hidden",
                                                 isSelected
-                                                    ? "bg-[#ccff00]/5 border-[#ccff00] shadow-[0_0_30px_-5px_rgba(204,255,0,0.15)]"
-                                                    : "bg-white/[0.03] border-white/5 hover:border-white/10 hover:bg-white/[0.05]"
+                                                    ? "bg-[#ccff00]/10 border-[#ccff00] shadow-[0_0_30px_-5px_rgba(204,255,0,0.3)]"
+                                                    : "bg-white/5 border-white/10 hover:border-white/30 hover:bg-white/10 hover:shadow-lg hover:shadow-black/20"
                                             )}
                                         >
-                                            <div className="flex items-center justify-between">
+                                            <div className="flex items-center justify-between relative z-10">
                                                 <div className="flex items-center gap-4">
-                                                    {'icon' in option && <span className="text-xl">{option.icon}</span>}
+                                                    {'icon' in option && <span className="text-xl opacity-80 filter drop-shadow-md">{option.icon}</span>}
                                                     <div>
-                                                        <div className={cn("font-medium text-lg transition-colors", isSelected ? "text-white" : "text-zinc-300 group-hover:text-white")}>
+                                                        <div className={cn("font-medium text-base md:text-lg transition-colors duration-300", isSelected ? "text-white" : "text-zinc-200 group-hover:text-white")}>
                                                             {option.label}
                                                         </div>
                                                         {'desc' in option && (
-                                                            <div className="text-sm text-zinc-500 mt-0.5 group-hover:text-zinc-400 transition-colors">
+                                                            <div className="text-xs text-zinc-400 mt-1 group-hover:text-zinc-300 transition-colors font-medium">
                                                                 {option.desc}
                                                             </div>
                                                         )}
                                                     </div>
                                                 </div>
                                                 <div className={cn(
-                                                    "w-6 h-6 rounded-full border flex items-center justify-center transition-all duration-300",
+                                                    "w-5 h-5 rounded-full border flex items-center justify-center transition-all duration-300",
                                                     isSelected
-                                                        ? "bg-[#ccff00] border-[#ccff00] scale-110"
-                                                        : "border-white/10 group-hover:border-white/30"
+                                                        ? "bg-[#ccff00] border-[#ccff00] scale-110 shadow-[0_0_15px_rgba(204,255,0,0.6)]"
+                                                        : "border-white/20 group-hover:border-white/50 bg-white/5"
                                                 )}>
-                                                    {isSelected && <Check className="w-3.5 h-3.5 text-black stroke-[3px]" />}
+                                                    {isSelected && <Check className="w-3 h-3 text-black stroke-[3px]" />}
                                                 </div>
                                             </div>
+
+                                            {/* Glass Reflection/Shine */}
+                                            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
+                                            {/* Subtle Gradient Selection BG */}
+                                            {isSelected && (
+                                                <motion.div
+                                                    layoutId="selectionGradient"
+                                                    className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#ccff00]/10 to-transparent opacity-100"
+                                                />
+                                            )}
                                         </motion.button>
                                     );
                                 })}
@@ -243,43 +276,50 @@ export default function OnboardingPage() {
                     </AnimatePresence>
                 </div>
 
-                {/* Footer / Continue */}
-                <div className="pt-6">
-                    <motion.button
-                        onClick={handleContinue}
-                        disabled={!canContinue}
-                        className={cn(
-                            "group relative w-full flex items-center justify-center gap-3 py-4 rounded-xl font-bold tracking-wide transition-all duration-300 overflow-hidden",
-                            canContinue
-                                ? "bg-[#ccff00] text-black shadow-[0_0_20px_rgba(204,255,0,0.3)] hover:shadow-[0_0_30px_rgba(204,255,0,0.5)] hover:bg-[#d9ff33]"
-                                : "bg-zinc-800 text-zinc-500 cursor-not-allowed"
-                        )}
-                        whileTap={{ scale: 0.98 }}
-                    >
-                        <span className="relative z-10">{isLastStep ? "Launch Studio" : "Continue"}</span>
-                        <div className={cn(
-                            "absolute inset-0 bg-white/20 translate-y-full transition-transform duration-300",
-                            canContinue && "group-hover:translate-y-0"
-                        )} />
-                        <ArrowRight className={cn(
-                            "w-5 h-5 transition-transform duration-300",
-                            canContinue && "group-hover:translate-x-1"
-                        )} />
-                    </motion.button>
+                {/* Floating Footer */}
+                <div className="mt-auto px-8 pb-12 md:px-16 md:pb-24">
+                    <div className="max-w-xl mx-auto w-full">
+                        <motion.button
+                            onClick={handleContinue}
+                            disabled={!canContinue}
+                            className={cn(
+                                "group relative w-full flex items-center justify-center gap-3 py-4 rounded-xl font-bold tracking-wide transition-all duration-500 overflow-hidden shadow-2xl backdrop-blur-md",
+                                canContinue
+                                    ? "bg-[#ccff00] text-black hover:shadow-[0_0_50px_rgba(204,255,0,0.5)] hover:scale-[1.02] border border-[#ccff00]/50"
+                                    : "bg-zinc-800/40 border border-white/5 text-zinc-500 cursor-not-allowed"
+                            )}
+                            whileTap={{ scale: 0.98 }}
+                        >
+                            <span className="relative z-10 text-base md:text-lg">{isLastStep ? "Launch Studio" : "Continue"}</span>
+                            <div className={cn(
+                                "absolute inset-0 bg-white/40 translate-y-full transition-transform duration-300 ease-out blur-md",
+                                canContinue && "group-hover:translate-y-0"
+                            )} />
+                            <ArrowRight className={cn(
+                                "w-5 h-5 transition-transform duration-300",
+                                canContinue && "group-hover:translate-x-1"
+                            )} />
+                        </motion.button>
+                    </div>
                 </div>
 
             </div>
 
             {/* Right Panel - Visual Gallery */}
-            <div className="hidden lg:block relative w-[55%] h-full p-4 pl-0">
-                <div className="relative h-full w-full rounded-[2.5rem] overflow-hidden bg-zinc-900 border border-white/5 ring-1 ring-white/5">
+            <div className="hidden md:block relative w-full md:w-[50%] h-full p-4 pl-0">
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.9, rotate: 2 }}
+                    animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                    transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+                    className="relative h-full w-full rounded-[2.5rem] overflow-hidden bg-zinc-900 border border-white/5 ring-1 ring-white/5 shadow-2xl"
+                >
                     <AnimatePresence mode="popLayout" custom={direction}>
                         <motion.div
                             key={currentStep}
-                            initial={{ opacity: 0, scale: 1.1, filter: "blur(10px)" }}
+                            initial={{ opacity: 0, scale: 1.05, filter: "blur(20px)" }}
                             animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-                            exit={{ opacity: 0, scale: 1.1, filter: "blur(5px)" }} // Scale down slightly on exit maybe? No, scale up looks like moving in/out depth
-                            transition={{ duration: 0.8, ease: [0.32, 0.72, 0, 1] }}
+                            exit={{ opacity: 0, scale: 0.95, filter: "blur(10px)" }}
+                            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
                             className="absolute inset-0 w-full h-full"
                         >
                             {stepData.media.type === 'video' ? (
@@ -303,20 +343,19 @@ export default function OnboardingPage() {
                                 </div>
                             )}
 
-                            {/* Cinematic Overlay */}
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30 pointer-events-none" />
+                            {/* Cinematic Overlay - Darker at bottom */}
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent pointer-events-none" />
 
-                            {/* Dynamic Floating Labels */}
-                            <div className="absolute bottom-12 left-12 flex flex-wrap gap-3">
+                            {/* Dynamic Floating Labels - Staggered */}
+                            <div className="absolute bottom-16 left-12 flex flex-wrap gap-3 max-w-[80%]">
                                 {stepData.media.overlayPoints?.map((point, idx) => (
                                     <motion.div
                                         key={point}
-                                        initial={{ opacity: 0, y: 20 }}
+                                        initial={{ opacity: 0, y: 30 }}
                                         animate={{ opacity: 1, y: 0 }}
-                                        transition={{ delay: 0.5 + (idx * 0.2), duration: 0.5 }}
-                                        className="px-4 py-2 rounded-full border border-white/10 bg-black/40 backdrop-blur-md text-xs font-medium text-white/90 flex items-center gap-2"
+                                        transition={{ delay: 0.4 + (idx * 0.1), duration: 0.6, ease: "backOut" }}
+                                        className="px-5 py-2.5 rounded-full border border-white/10 bg-black/60 backdrop-blur-xl text-sm font-medium text-white shadow-lg flex items-center gap-2.5 hover:scale-105 transition-transform cursor-default"
                                     >
-                                        <Sparkles className="w-3 h-3 text-[#ccff00]" />
                                         {point}
                                     </motion.div>
                                 ))}
@@ -326,8 +365,8 @@ export default function OnboardingPage() {
                     </AnimatePresence>
 
                     {/* Persistent Noise/Grain Overlay */}
-                    <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('/noise.svg')]" />
-                </div>
+                    <div className="absolute inset-0 opacity-[0.04] pointer-events-none bg-[url('/noise.svg')]" />
+                </motion.div>
             </div>
         </div>
     );

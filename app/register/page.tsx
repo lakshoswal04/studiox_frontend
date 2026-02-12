@@ -27,15 +27,16 @@ export default function RegisterPage() {
     useEffect(() => {
         // Capture redirect params once on mount
         const params = new URLSearchParams(window.location.search);
-        redirectPath.current = params.get('redirect') || "/";
+        redirectPath.current = params.get('redirect') || "/onboarding";
     }, []);
 
     useEffect(() => {
-        // Only redirect if not waiting for verification
-        if (!loading && user && !isVerificationSent) {
-            router.push(redirectPath.current);
+        // If we have a user (session), it means they are verified (or confirmation is off).
+        // We should redirect them immediately to onboarding.
+        if (!loading && user) {
+            router.push(redirectPath.current || "/onboarding");
         }
-    }, [user, loading, router, isVerificationSent]);
+    }, [user, loading, router]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -81,13 +82,22 @@ export default function RegisterPage() {
                         <h2 className="text-2xl font-bold text-white mb-4">Check your inbox</h2>
                         <p className="text-white/60 mb-8">
                             We've sent a verification link to <span className="text-white font-medium">{formData.email}</span>.
-                            Please verify your email to access your account.
+                            <br />
+                            Please click the link in your email to verify your account.
                         </p>
-                        <Link href="/login">
-                            <Button className="w-full h-11 bg-white text-black hover:bg-white/90 font-bold rounded-xl">
-                                Back to Sign In
+                        <div className="flex gap-3">
+                            <Button
+                                onClick={() => window.location.reload()}
+                                className="flex-1 h-11 bg-[#ccff00] text-black hover:bg-[#b3e600] font-bold rounded-xl"
+                            >
+                                I've Verified
                             </Button>
-                        </Link>
+                            <Link href="/login" className="flex-1">
+                                <Button variant="outline" className="w-full h-11 border-white/10 text-white hover:bg-white/10 font-medium rounded-xl">
+                                    Sign In
+                                </Button>
+                            </Link>
+                        </div>
                     </div>
                 </motion.div>
             </div>
