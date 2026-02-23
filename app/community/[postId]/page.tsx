@@ -1,22 +1,21 @@
 "use client"
 
 import { useParams } from "next/navigation"
-import { motion } from "framer-motion"
-import { ArrowLeft, MoreHorizontal, Heart, Share2, Sparkles, Download, Copy, Link as LinkIcon } from "lucide-react"
+import { ArrowLeft, MoreHorizontal, Heart, Share2, Sparkles, Link as LinkIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import Image from "next/image"
 import { communityPosts } from "@/lib/community-data"
 import { useAuth } from "@/context/auth-context"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { useState, useCallback } from "react"
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { toast } from "sonner" // Assuming you have sonner or some toast
+import { toast } from "sonner"
 
 export default function PostDetailPage() {
     const params = useParams()
@@ -26,21 +25,7 @@ export default function PostDetailPage() {
     const { user } = useAuth()
     const router = useRouter()
 
-    // Fallback if not found (in real app, use notFound())
-    if (!post) {
-        return (
-            <div className="flex min-h-screen items-center justify-center bg-[#020202] text-white">
-                <div className="text-center">
-                    <h2 className="text-2xl font-bold">Post not found</h2>
-                    <Button asChild className="mt-4" variant="outline">
-                        <Link href="/community">Return to Community</Link>
-                    </Button>
-                </div>
-            </div>
-        )
-    }
-
-    const handleShare = (platform: string) => {
+    const handleShare = useCallback((platform: string) => {
         const url = encodeURIComponent(window.location.href)
         const title = encodeURIComponent(post?.title || "Check this out on StudioX")
 
@@ -65,29 +50,37 @@ export default function PostDetailPage() {
         if (shareUrl) {
             window.open(shareUrl, '_blank', 'width=600,height=400')
         }
+    }, [post?.title])
+
+    // Fallback if not found
+    if (!post) {
+        return (
+            <div className="flex min-h-screen items-center justify-center bg-[#020202] text-white">
+                <div className="text-center">
+                    <h2 className="text-2xl font-bold">Post not found</h2>
+                    <Button asChild className="mt-4" variant="outline">
+                        <Link href="/community">Return to Community</Link>
+                    </Button>
+                </div>
+            </div>
+        )
     }
 
     return (
         <main className="min-h-screen bg-[#020202] text-white selection:bg-purple-500/30">
-            {/* ... Navbar (omitted for brevity in replacement, assuming context matches) ... */}
-            {/* ACTUALLY, I must not omit code if I am replacing a chunk. I will target the specific chunk containing handleShare and the return start if possible, or just handleShare first.
-               Wait, I need to replace the DropdownContent too. I will do this in one large chunk or two.
-               Let's replace handleShare first.
-            */}
 
             {/* Navbar Overlay */}
-            <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between p-6 bg-gradient-to-b from-black/80 to-transparent pointer-events-none">
-                <div className="pointer-events-auto">
-                    <Button variant="ghost" size="icon" className="rounded-full bg-white/5 hover:bg-white/10 backdrop-blur-md" asChild>
-                        <Link href="/community">
-                            <ArrowLeft className="h-5 w-5" />
-                        </Link>
-                    </Button>
-                </div>
-                <div className="pointer-events-auto">
+            <nav className="fixed top-0 left-0 right-0 z-[9999] flex items-center justify-between p-4 md:p-6 pointer-events-none">
+                <a
+                    href="/community"
+                    className="pointer-events-auto inline-flex items-center justify-center h-11 w-11 rounded-full bg-black/60 hover:bg-black/80 border border-white/20 backdrop-blur-md text-white shadow-xl transition-colors duration-200 z-[9999]"
+                >
+                    <ArrowLeft className="h-5 w-5" />
+                </a>
+                <div className="pointer-events-auto z-[9999]">
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="rounded-full bg-white/5 hover:bg-white/10 backdrop-blur-md">
+                            <Button variant="ghost" size="icon" className="rounded-full bg-black/60 hover:bg-black/80 border border-white/20 backdrop-blur-md h-11 w-11 text-white">
                                 <MoreHorizontal className="h-5 w-5" />
                             </Button>
                         </DropdownMenuTrigger>
@@ -99,20 +92,33 @@ export default function PostDetailPage() {
             </nav>
 
             <div className="flex flex-col lg:flex-row h-full">
-                {/* Left/Top: Image Content (Full height on desktop) */}
+                {/* Left/Top: Image Content */}
                 <div className="relative w-full lg:h-screen bg-[#0b0b0b] flex items-center justify-center overflow-hidden">
                     {/* Blurry Background */}
-                    <div className="absolute inset-0 opacity-20 blur-3xl scale-110 pointer-events-none">
-                        <Image
-                            src={post.thumbnailUrl}
-                            alt="bg"
-                            fill
-                            className="object-cover"
-                        />
+                    <div className="absolute inset-0 opacity-30 scale-110 pointer-events-none">
+                        {post.thumbnailUrl.endsWith('.mp4') ? (
+                            <video
+                                src={post.thumbnailUrl}
+                                autoPlay
+                                loop
+                                muted
+                                playsInline
+                                className="w-full h-full object-cover blur-2xl"
+                            />
+                        ) : (
+                            <Image
+                                src={post.thumbnailUrl}
+                                alt=""
+                                fill
+                                className="object-cover blur-2xl"
+                                loading="lazy"
+                                sizes="100vw"
+                            />
+                        )}
                     </div>
 
                     {/* Main Content */}
-                    <div className="relative w-full h-[60vh] lg:h-[85vh] max-w-[90%] lg:max-w-4xl shadow-2xl">
+                    <div className="relative w-full h-[60vh] lg:h-[85vh] max-w-[90%] lg:max-w-4xl shadow-2xl overflow-hidden rounded-xl">
                         {post.type === "video" ? (
                             <video
                                 src={post.assetUrl}
@@ -120,27 +126,27 @@ export default function PostDetailPage() {
                                 loop
                                 muted
                                 playsInline
-                                className="w-full h-full object-contain drop-shadow-2xl"
+                                className="w-full h-full object-cover drop-shadow-2xl scale-[1.25]"
                             />
                         ) : (
                             <Image
                                 src={post.assetUrl}
                                 alt={post.title}
                                 fill
-                                className="object-contain drop-shadow-2xl"
+                                className="object-cover drop-shadow-2xl scale-[1.25]"
                                 priority
                             />
                         )}
                     </div>
                 </div>
 
-                {/* Right/Bottom: Sidebar (Metadata & Actions) */}
+                {/* Right/Bottom: Sidebar */}
                 <div className="w-full lg:w-[450px] bg-[#09090b] border-l border-white/5 overflow-y-auto lg:h-screen p-6 lg:p-8 flex flex-col pt-20 lg:pt-8 z-10 shadow-2xl lg:shadow-none">
 
                     {/* Author */}
                     <div className="flex items-center gap-3 mb-6">
                         <div className="relative w-10 h-10 rounded-full overflow-hidden border border-white/10">
-                            <Image src={post.author.avatar} alt={post.author.name} fill className="object-cover" />
+                            <Image src={post.author.avatar} alt={post.author.name} fill className="object-cover" sizes="40px" />
                         </div>
                         <div>
                             <h3 className="text-sm font-medium text-white">{post.author.name}</h3>
@@ -169,7 +175,7 @@ export default function PostDetailPage() {
                     <div className="flex items-center gap-3 mb-8">
                         <Button
                             variant="outline"
-                            className={`flex-1 h-12 rounded-xl border-white/10 text-base ${isLiked ? 'bg-red-500/10 text-red-500 border-red-500/20' : 'bg-white/5 hover:bg-white/10'}`}
+                            className={`flex-1 h-12 rounded-xl border-white/10 text-base transition-colors duration-200 ${isLiked ? 'bg-red-500/10 text-red-500 border-red-500/20' : 'bg-white/5 hover:bg-white/10'}`}
                             onClick={() => setIsLiked(!isLiked)}
                         >
                             <Heart className={`h-5 w-5 mr-2 ${isLiked ? "fill-current" : ""}`} />
@@ -243,9 +249,13 @@ export default function PostDetailPage() {
                         <h4 className="text-xs font-semibold uppercase tracking-wider text-zinc-600 mb-3">Tags</h4>
                         <div className="flex flex-wrap gap-2">
                             {post.tags.map(tag => (
-                                <span key={tag} className="px-3 py-1.5 rounded-md bg-white/5 border border-white/5 text-xs text-zinc-400 hover:bg-white/10 hover:text-zinc-200 transition-colors cursor-pointer">
+                                <button
+                                    key={tag}
+                                    onClick={() => router.push(`/community?tag=${tag}`)}
+                                    className="px-3 py-1.5 rounded-md bg-white/5 border border-white/5 text-xs text-zinc-400 hover:bg-white/10 hover:text-zinc-200 transition-colors duration-200 cursor-pointer"
+                                >
                                     #{tag}
-                                </span>
+                                </button>
                             ))}
                         </div>
                     </div>
