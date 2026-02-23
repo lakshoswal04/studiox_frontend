@@ -1,61 +1,80 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useMemo } from "react"
 import { gsap } from "gsap"
-import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { CommunityPostCard } from "@/components/community-post-card"
 import { communityPosts } from "@/lib/community-data"
-
-if (typeof window !== "undefined") {
-    gsap.registerPlugin(ScrollTrigger)
-}
+import { useSearchParams } from "next/navigation"
 
 export function CommunityGrid() {
     const gridRef = useRef<HTMLDivElement>(null)
+    const searchParams = useSearchParams()
+    const hasAnimated = useRef(false)
+
+    const tagFilter = searchParams.get("tag")
+
+    const filteredPosts = useMemo(() => {
+        if (!tagFilter) return communityPosts
+        return communityPosts.filter(post =>
+            post.tags.some(tag => tag.toLowerCase() === tagFilter.toLowerCase())
+        )
+    }, [tagFilter])
 
     useEffect(() => {
-        const ctx = gsap.context(() => {
-            // Masonry Entrance
-            const cards = gsap.utils.toArray<HTMLElement>(".community-card-inner")
+        if (hasAnimated.current) return
+        hasAnimated.current = true
 
-            // Set initial state
-            gsap.set(cards, { opacity: 0, y: 30 })
+        const cards = gridRef.current?.querySelectorAll<HTMLElement>(".community-card-inner")
+        if (!cards || cards.length === 0) return
 
-            ScrollTrigger.batch(cards, {
-                onEnter: (batch) => {
-                    gsap.to(batch, {
-                        opacity: 1,
-                        y: 0,
-                        duration: 0.8,
-                        stagger: 0.08,
-                        ease: "power2.out",
-                        overwrite: true
-                    })
-                },
-                start: "top 95%",
-                once: true
-            })
-        }, gridRef)
+        // Simple staggered fade-in using IntersectionObserver
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry, i) => {
+                    if (entry.isIntersecting) {
+                        const el = entry.target as HTMLElement
+                        const delay = i * 0.04
+                        gsap.to(el, {
+                            opacity: 1,
+                            y: 0,
+                            duration: 0.35,
+                            delay,
+                            ease: "power2.out",
+                        })
+                        observer.unobserve(el)
+                    }
+                })
+            },
+            { rootMargin: "200px", threshold: 0.01 }
+        )
 
-        // Trigger refresh slightly after mount to ensure layout is ready
-        const timer = setTimeout(() => {
-            ScrollTrigger.refresh()
-        }, 100)
+        cards.forEach(card => observer.observe(card))
 
-        return () => {
-            ctx.revert()
-            clearTimeout(timer)
-        }
-    }, [])
+        return () => observer.disconnect()
+    }, [filteredPosts])
+
+    // Reset animation tracking when tag changes
+    useEffect(() => {
+        hasAnimated.current = false
+    }, [tagFilter])
+
+    if (filteredPosts.length === 0) {
+        return (
+            <div className="flex flex-col items-center justify-center py-20 text-center">
+                <p className="text-xl font-medium text-white mb-2">No generations found</p>
+                <p className="text-zinc-500">There are no posts with the tag &quot;#{tagFilter}&quot;.</p>
+            </div>
+        )
+    }
 
     return (
         <div ref={gridRef} className="columns-1 sm:columns-2 lg:columns-3 2xl:columns-4 gap-6 space-y-6">
-            {communityPosts.map((post, index) => (
+            {filteredPosts.map((post, index) => (
                 <div
                     key={post.id}
                     className="break-inside-avoid mb-6"
                 >
-                    <div className="community-card-inner opacity-0 translate-y-8 rounded-xl overflow-hidden block">
+                    <div className="community-card-inner rounded-xl overflow-hidden block" style={{ opacity: 0, transform: 'translateY(20px)' }}>
                         <CommunityPostCard post={post} index={index} />
                     </div>
                 </div>
