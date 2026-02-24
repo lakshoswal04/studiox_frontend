@@ -78,7 +78,9 @@ export function Navbar() {
     { href: "/pricing", label: "Pricing" },
   ]
 
-
+  // Hide global navbar on community post detail pages (they have their own nav)
+  const isCommunityPostDetail = /^\/community\/.+/.test(pathname)
+  if (isCommunityPostDetail) return null
 
   return (
     <>

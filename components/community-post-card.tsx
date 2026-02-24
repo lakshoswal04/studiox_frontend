@@ -2,12 +2,13 @@
 
 import { Button } from "@/components/ui/button"
 import type { CommunityPost } from "@/lib/types"
-import { Heart } from "lucide-react"
+import { Heart, Info, ChevronUp, ChevronDown, RefreshCw, Film, Download, Maximize2, Pencil } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { useAuth } from "@/context/auth-context"
 import { useRouter } from "next/navigation"
 import { useState, useRef, useEffect, useCallback, memo } from "react"
+import { toast } from "sonner"
 
 interface CommunityPostCardProps {
   post: CommunityPost
@@ -19,6 +20,7 @@ export const CommunityPostCard = memo(function CommunityPostCard({ post, index }
   const router = useRouter()
   const [isLiked, setIsLiked] = useState(false)
   const [isVisible, setIsVisible] = useState(false)
+  const [showInfo, setShowInfo] = useState(false)
   const cardRef = useRef<HTMLDivElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
 
@@ -72,11 +74,41 @@ export const CommunityPostCard = memo(function CommunityPostCard({ post, index }
     setIsLiked(prev => !prev)
   }, [])
 
+  const navigateToStudio = useCallback((mode: string, prompt: string) => {
+    const target = `/studio?mode=${mode}&prompt=${encodeURIComponent(prompt)}&previewUrl=${encodeURIComponent(post.assetUrl)}`
+    if (!user) {
+      router.push(`/login?redirect=${encodeURIComponent(target)}`)
+    } else {
+      router.push(target)
+    }
+  }, [user, post.assetUrl, router])
+
+  const handleDownload = useCallback(async () => {
+    try {
+      toast.loading("Preparing download...", { id: `dl-${post.id}` })
+      const res = await fetch(post.assetUrl)
+      const blob = await res.blob()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      const ext = post.assetUrl.split('.').pop() || (post.type === "video" ? "mp4" : "png")
+      a.href = url
+      a.download = `${post.title.replace(/\s+/g, '_')}.${ext}`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+      toast.success("Download started!", { id: `dl-${post.id}` })
+    } catch {
+      toast.error("Download failed.", { id: `dl-${post.id}` })
+    }
+  }, [post.assetUrl, post.title, post.type, post.id])
+
   return (
-    <div ref={cardRef}>
+    <div ref={cardRef} className="rounded-xl overflow-hidden bg-[#111] border border-white/5">
+      {/* Image/Video - Clickable link to detail */}
       <Link
         href={`/community/${post.id}`}
-        className={`group relative block w-full rounded-xl overflow-hidden bg-[#111] border border-white/5 cursor-pointer ${aspectClass} hover:shadow-2xl hover:-translate-y-1 transition-transform duration-500 will-change-transform`}
+        className={`group relative block w-full overflow-hidden cursor-pointer ${aspectClass} hover:shadow-2xl transition-all duration-500 will-change-transform`}
         prefetch={false}
       >
         {/* Media Layer */}
@@ -163,6 +195,112 @@ export const CommunityPostCard = memo(function CommunityPostCard({ post, index }
           </div>
         </div>
       </Link>
+
+      {/* Information Panel */}
+      <div className="border-t border-white/5">
+        {/* Header - Always Visible */}
+        <button
+          onClick={() => setShowInfo(!showInfo)}
+          className="w-full flex items-center justify-between px-4 py-3 text-zinc-400 hover:text-zinc-200 transition-colors cursor-pointer"
+        >
+          <div className="flex items-center gap-2">
+            <Info className="h-3.5 w-3.5 text-emerald-400" />
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400">Information</span>
+          </div>
+          {showInfo ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
+        </button>
+
+        {/* Expandable Content */}
+        {showInfo && (
+          <>
+            <div className="divide-y divide-white/5 border-t border-white/5">
+              {post.model && (
+                <div className="flex items-center justify-between px-4 py-2.5">
+                  <span className="text-xs text-zinc-500">Model</span>
+                  <span className="text-xs font-medium text-white">{post.model}</span>
+                </div>
+              )}
+              {post.preset && (
+                <div className="flex items-center justify-between px-4 py-2.5">
+                  <span className="text-xs text-zinc-500">Preset</span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xs font-medium text-white">{post.preset}</span>
+                    <div className="relative w-5 h-5 rounded-full overflow-hidden border border-white/10">
+                      <Image src={post.author.avatar} alt="" fill className="object-cover" sizes="20px" />
+                    </div>
+                  </div>
+                </div>
+              )}
+              {post.quality && (
+                <div className="flex items-center justify-between px-4 py-2.5">
+                  <span className="text-xs text-zinc-500">Quality</span>
+                  <span className="text-xs font-medium text-white">{post.quality}</span>
+                </div>
+              )}
+              {post.size && (
+                <div className="flex items-center justify-between px-4 py-2.5">
+                  <span className="text-xs text-zinc-500">Size</span>
+                  <span className="text-xs font-medium text-white">{post.size}</span>
+                </div>
+              )}
+              <div className="flex items-center justify-between px-4 py-2.5">
+                <span className="text-xs text-zinc-500">Created</span>
+                <span className="text-xs font-medium text-white">
+                  {post.createdAt.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                </span>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="p-3 pt-2 space-y-2 border-t border-white/5">
+              <Button
+                className="w-full h-9 rounded-lg bg-[#c8ff00] hover:bg-[#b8ef00] text-black font-semibold text-xs transition-all duration-200"
+                onClick={() => navigateToStudio(post.type, post.prompt)}
+              >
+                <RefreshCw className="h-3.5 w-3.5 mr-1.5" />
+                Recreate
+              </Button>
+              <div className="grid grid-cols-2 gap-2">
+                <Button
+                  variant="outline"
+                  className="h-8 rounded-lg border-white/10 bg-white/[0.03] hover:bg-white/[0.08] text-zinc-400 text-[11px]"
+                  onClick={() => navigateToStudio("video", post.prompt)}
+                >
+                  <Film className="h-3 w-3 mr-1.5" />
+                  Video
+                </Button>
+                <Button
+                  variant="outline"
+                  className="h-8 rounded-lg border-white/10 bg-white/[0.03] hover:bg-white/[0.08] text-zinc-400 text-[11px]"
+                  onClick={handleDownload}
+                >
+                  <Download className="h-3 w-3 mr-1.5" />
+                  Download
+                </Button>
+                <Button
+                  variant="outline"
+                  className="h-8 rounded-lg border-white/10 bg-white/[0.03] hover:bg-white/[0.08] text-zinc-400 text-[11px]"
+                  onClick={() => {
+                    const upscalePrompt = `${post.prompt}, ultra high resolution 8k upscale, enhanced details, maximum quality`
+                    navigateToStudio(post.type, upscalePrompt)
+                  }}
+                >
+                  <Maximize2 className="h-3 w-3 mr-1.5" />
+                  Upscale
+                </Button>
+                <Button
+                  variant="outline"
+                  className="h-8 rounded-lg border-white/10 bg-white/[0.03] hover:bg-white/[0.08] text-zinc-400 text-[11px]"
+                  onClick={() => navigateToStudio(post.type, post.prompt)}
+                >
+                  <Pencil className="h-3 w-3 mr-1.5" />
+                  Edit
+                </Button>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
     </div>
   )
 })

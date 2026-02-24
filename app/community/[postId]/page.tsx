@@ -1,7 +1,7 @@
 "use client"
 
 import { useParams } from "next/navigation"
-import { ArrowLeft, MoreHorizontal, Heart, Share2, Sparkles, Link as LinkIcon } from "lucide-react"
+import { ArrowLeft, MoreHorizontal, Heart, Share2, Sparkles, Link as LinkIcon, Info, ChevronUp, ChevronDown, RefreshCw, Film, Download, Maximize2, Pencil, UserCheck } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import Image from "next/image"
@@ -22,6 +22,8 @@ export default function PostDetailPage() {
     const postId = params.postId as string
     const post = communityPosts.find(p => p.id === postId)
     const [isLiked, setIsLiked] = useState(false)
+    const [isFollowing, setIsFollowing] = useState(false)
+    const [showInfo, setShowInfo] = useState(true)
     const { user } = useAuth()
     const router = useRouter()
 
@@ -70,7 +72,7 @@ export default function PostDetailPage() {
         <main className="min-h-screen bg-[#020202] text-white selection:bg-purple-500/30">
 
             {/* Navbar Overlay */}
-            <nav className="fixed top-0 left-0 right-0 z-[9999] flex items-center justify-between p-4 md:p-6 pointer-events-none">
+            <nav className="fixed top-0 left-0 right-0 lg:right-[450px] z-[9999] flex items-center justify-between p-4 md:p-6 pointer-events-none">
                 <a
                     href="/community"
                     className="pointer-events-auto inline-flex items-center justify-center h-11 w-11 rounded-full bg-black/60 hover:bg-black/80 border border-white/20 backdrop-blur-md text-white shadow-xl transition-colors duration-200 z-[9999]"
@@ -91,9 +93,9 @@ export default function PostDetailPage() {
                 </div>
             </nav>
 
-            <div className="flex flex-col lg:flex-row h-full">
+            <div className="flex flex-col lg:flex-row min-h-screen lg:h-screen">
                 {/* Left/Top: Image Content */}
-                <div className="relative w-full lg:h-screen bg-[#0b0b0b] flex items-center justify-center overflow-hidden">
+                <div className="relative w-full lg:flex-1 lg:h-full bg-[#0b0b0b] flex items-center justify-center overflow-hidden">
                     {/* Blurry Background */}
                     <div className="absolute inset-0 opacity-30 scale-110 pointer-events-none">
                         {post.thumbnailUrl.endsWith('.mp4') ? (
@@ -141,7 +143,7 @@ export default function PostDetailPage() {
                 </div>
 
                 {/* Right/Bottom: Sidebar */}
-                <div className="w-full lg:w-[450px] bg-[#09090b] border-l border-white/5 overflow-y-auto lg:h-screen p-6 lg:p-8 flex flex-col pt-20 lg:pt-8 z-10 shadow-2xl lg:shadow-none">
+                <div className="w-full lg:w-[450px] lg:shrink-0 bg-[#09090b] border-l border-white/5 overflow-y-auto lg:h-full p-6 lg:p-8 pt-20 lg:pt-8 z-10 shadow-2xl lg:shadow-none">
 
                     {/* Author */}
                     <div className="flex items-center gap-3 mb-6">
@@ -155,10 +157,30 @@ export default function PostDetailPage() {
                         <div className="ml-auto">
                             <Button
                                 size="sm"
-                                variant="outline"
-                                className="rounded-full h-8 text-xs border-white/10 bg-white/5 hover:bg-white/10"
+                                variant={isFollowing ? "default" : "outline"}
+                                className={`rounded-full h-8 text-xs transition-all duration-200 ${isFollowing
+                                        ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 hover:bg-red-500/15 hover:text-red-400 hover:border-red-500/30"
+                                        : "border-white/10 bg-white/5 hover:bg-white/10"
+                                    }`}
+                                onClick={() => {
+                                    if (!user) {
+                                        router.push(`/login?redirect=${encodeURIComponent(window.location.pathname)}`)
+                                        return
+                                    }
+                                    setIsFollowing(prev => {
+                                        const next = !prev
+                                        toast.success(next ? `Following ${post.author.name}` : `Unfollowed ${post.author.name}`, {
+                                            icon: next ? "✅" : "👋",
+                                        })
+                                        return next
+                                    })
+                                }}
                             >
-                                Follow
+                                {isFollowing ? (
+                                    <><UserCheck className="h-3.5 w-3.5 mr-1" /> Following</>
+                                ) : (
+                                    "Follow"
+                                )}
                             </Button>
                         </div>
                     </div>
@@ -216,6 +238,157 @@ export default function PostDetailPage() {
                         </DropdownMenu>
                     </div>
 
+                    {/* Information Panel */}
+                    <div className="mb-8 rounded-2xl bg-[#111113] border border-white/5 overflow-hidden">
+                        {/* Header */}
+                        <div className="flex items-center gap-2 px-5 py-3.5 border-b border-white/5">
+                            <Info className="h-4 w-4 text-emerald-400" />
+                            <span className="text-xs font-semibold uppercase tracking-wider text-zinc-300">Information</span>
+                        </div>
+
+                        {/* Collapsible Content */}
+                        {showInfo && (
+                            <div className="divide-y divide-white/5">
+                                {post.model && (
+                                    <div className="flex items-center justify-between px-5 py-3.5">
+                                        <span className="text-sm text-zinc-500">Model</span>
+                                        <span className="text-sm font-medium text-white">{post.model}</span>
+                                    </div>
+                                )}
+                                {post.preset && (
+                                    <div className="flex items-center justify-between px-5 py-3.5">
+                                        <span className="text-sm text-zinc-500">Preset</span>
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-sm font-medium text-white">{post.preset}</span>
+                                            <div className="relative w-6 h-6 rounded-full overflow-hidden border border-white/10">
+                                                <Image src={post.author.avatar} alt="" fill className="object-cover" sizes="24px" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                                {post.quality && (
+                                    <div className="flex items-center justify-between px-5 py-3.5">
+                                        <span className="text-sm text-zinc-500">Quality</span>
+                                        <span className="text-sm font-medium text-white">{post.quality}</span>
+                                    </div>
+                                )}
+                                {post.size && (
+                                    <div className="flex items-center justify-between px-5 py-3.5">
+                                        <span className="text-sm text-zinc-500">Size</span>
+                                        <span className="text-sm font-medium text-white">{post.size}</span>
+                                    </div>
+                                )}
+                                <div className="flex items-center justify-between px-5 py-3.5">
+                                    <span className="text-sm text-zinc-500">Created</span>
+                                    <span className="text-sm font-medium text-white">
+                                        {post.createdAt.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                                    </span>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Toggle */}
+                        <button
+                            onClick={() => setShowInfo(!showInfo)}
+                            className="w-full flex items-center justify-between px-5 py-3 border-t border-white/5 text-zinc-500 hover:text-zinc-300 transition-colors cursor-pointer"
+                        >
+                            <span className="text-sm">{showInfo ? 'Show less' : 'Show more'}</span>
+                            {showInfo ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                        </button>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="mb-8 space-y-3">
+                        <Button
+                            className="w-full h-12 rounded-xl bg-[#c8ff00] hover:bg-[#b8ef00] text-black font-semibold text-sm transition-all duration-200"
+                            onClick={() => {
+                                if (!user) {
+                                    const target = `/studio?mode=${post.type}&prompt=${encodeURIComponent(post.prompt)}`
+                                    router.push(`/login?redirect=${encodeURIComponent(target)}`)
+                                } else {
+                                    router.push(`/studio?mode=${post.type}&prompt=${encodeURIComponent(post.prompt)}`)
+                                }
+                            }}
+                        >
+                            <RefreshCw className="h-4 w-4 mr-2" />
+                            Recreate
+                        </Button>
+                        <div className="grid grid-cols-2 gap-3">
+                            <Button
+                                variant="outline"
+                                className="h-11 rounded-xl border-white/10 bg-white/[0.03] hover:bg-white/[0.08] text-zinc-300 text-sm"
+                                onClick={() => {
+                                    const target = `/studio?mode=video&prompt=${encodeURIComponent(post.prompt)}&previewUrl=${encodeURIComponent(post.assetUrl)}`
+                                    if (!user) {
+                                        router.push(`/login?redirect=${encodeURIComponent(target)}`)
+                                    } else {
+                                        router.push(target)
+                                    }
+                                }}
+                            >
+                                <Film className="h-4 w-4 mr-2" />
+                                Video
+                            </Button>
+                            <Button
+                                variant="outline"
+                                className="h-11 rounded-xl border-white/10 bg-white/[0.03] hover:bg-white/[0.08] text-zinc-300 text-sm"
+                                onClick={async () => {
+                                    try {
+                                        toast.loading("Preparing download...", { id: "download" })
+                                        const res = await fetch(post.assetUrl)
+                                        const blob = await res.blob()
+                                        const url = URL.createObjectURL(blob)
+                                        const a = document.createElement("a")
+                                        const ext = post.assetUrl.split('.').pop() || (post.type === "video" ? "mp4" : "png")
+                                        a.href = url
+                                        a.download = `${post.title.replace(/\s+/g, '_')}.${ext}`
+                                        document.body.appendChild(a)
+                                        a.click()
+                                        document.body.removeChild(a)
+                                        URL.revokeObjectURL(url)
+                                        toast.success("Download started!", { id: "download" })
+                                    } catch {
+                                        toast.error("Download failed. Please try again.", { id: "download" })
+                                    }
+                                }}
+                            >
+                                <Download className="h-4 w-4 mr-2" />
+                                Download
+                            </Button>
+                            <Button
+                                variant="outline"
+                                className="h-11 rounded-xl border-white/10 bg-white/[0.03] hover:bg-white/[0.08] text-zinc-300 text-sm"
+                                onClick={() => {
+                                    const upscalePrompt = `${post.prompt}, ultra high resolution 8k upscale, enhanced details, maximum quality`
+                                    const target = `/studio?mode=${post.type}&prompt=${encodeURIComponent(upscalePrompt)}&previewUrl=${encodeURIComponent(post.assetUrl)}`
+                                    if (!user) {
+                                        router.push(`/login?redirect=${encodeURIComponent(target)}`)
+                                    } else {
+                                        router.push(target)
+                                    }
+                                }}
+                            >
+                                <Maximize2 className="h-4 w-4 mr-2" />
+                                Upscale
+                            </Button>
+                            <Button
+                                variant="outline"
+                                className="h-11 rounded-xl border-white/10 bg-white/[0.03] hover:bg-white/[0.08] text-zinc-300 text-sm"
+                                onClick={() => {
+                                    const target = `/studio?mode=${post.type}&prompt=${encodeURIComponent(post.prompt)}&previewUrl=${encodeURIComponent(post.assetUrl)}`
+                                    if (!user) {
+                                        router.push(`/login?redirect=${encodeURIComponent(target)}`)
+                                    } else {
+                                        router.push(target)
+                                    }
+                                }}
+                            >
+                                <Pencil className="h-4 w-4 mr-2" />
+                                Edit
+                            </Button>
+                        </div>
+                    </div>
+
                     {/* Remix CTA */}
                     {post.allowRemix && (
                         <div className="mb-8 p-1 rounded-2xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
@@ -245,7 +418,7 @@ export default function PostDetailPage() {
                     )}
 
                     {/* Tags */}
-                    <div className="mt-auto">
+                    <div className="mt-8">
                         <h4 className="text-xs font-semibold uppercase tracking-wider text-zinc-600 mb-3">Tags</h4>
                         <div className="flex flex-wrap gap-2">
                             {post.tags.map(tag => (

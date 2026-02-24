@@ -80,4 +80,8 @@ export interface CommunityPost {
   type: "image" | "video"
   prompt: string
   tags: string[]
+  model?: string
+  preset?: string
+  quality?: string
+  size?: string
 }
