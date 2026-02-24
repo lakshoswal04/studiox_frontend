@@ -19,7 +19,11 @@ export const communityPosts: CommunityPost[] = [
         views: 5300,
         allowRemix: true,
         createdAt: new Date("2024-01-15"),
-        tags: ["fantasy", "forest", "cinematic"]
+        tags: ["fantasy", "forest", "cinematic"],
+        model: "Runway Gen-3 Alpha",
+        preset: "Cinematic",
+        quality: "4k",
+        size: "1920x1080"
     },
     {
         id: "post-2",
@@ -39,7 +43,11 @@ export const communityPosts: CommunityPost[] = [
         views: 2100,
         allowRemix: true,
         createdAt: new Date("2024-01-18"),
-        tags: ["abstract", "gold", "fluid"]
+        tags: ["abstract", "gold", "fluid"],
+        model: "StudioX Flux Pro",
+        preset: "Artistic",
+        quality: "8k",
+        size: "1536x2048"
     },
     {
         id: "post-3",
@@ -59,7 +67,11 @@ export const communityPosts: CommunityPost[] = [
         views: 1200,
         allowRemix: true,
         createdAt: new Date("2024-01-20"),
-        tags: ["retro", "vaporwave", "synthwave"]
+        tags: ["retro", "vaporwave", "synthwave"],
+        model: "Kling v2",
+        preset: "Stylized",
+        quality: "4k",
+        size: "1080x1080"
     },
     {
         id: "post-4",
@@ -79,7 +91,11 @@ export const communityPosts: CommunityPost[] = [
         views: 3400,
         allowRemix: true,
         createdAt: new Date("2024-01-25"),
-        tags: ["science", "neural", "abstract"]
+        tags: ["science", "neural", "abstract"],
+        model: "Runway Gen-3 Alpha",
+        preset: "General",
+        quality: "4k",
+        size: "1920x1080"
     },
     {
         id: "post-5",
@@ -99,7 +115,11 @@ export const communityPosts: CommunityPost[] = [
         views: 4100,
         allowRemix: true,
         createdAt: new Date("2024-02-01"),
-        tags: ["ocean", "nature", "bioluminscent"]
+        tags: ["ocean", "nature", "bioluminscent"],
+        model: "Kling v2",
+        preset: "Cinematic",
+        quality: "4k",
+        size: "1080x1440"
     },
     {
         id: "post-7",
@@ -119,7 +139,11 @@ export const communityPosts: CommunityPost[] = [
         views: 15400,
         allowRemix: true,
         createdAt: new Date("2024-02-06"),
-        tags: ["scifi", "monolith", "epic"]
+        tags: ["scifi", "monolith", "epic"],
+        model: "Runway Gen-3 Alpha",
+        preset: "Cinematic",
+        quality: "4k",
+        size: "1920x1080"
     },
     {
         id: "post-21",
@@ -139,7 +163,11 @@ export const communityPosts: CommunityPost[] = [
         views: 8900,
         allowRemix: true,
         createdAt: new Date("2024-01-22"),
-        tags: ["cyberpunk", "samurai", "character"]
+        tags: ["cyberpunk", "samurai", "character"],
+        model: "Midjourney v6",
+        preset: "General",
+        quality: "8k",
+        size: "1536x2048"
     },
     {
         id: "post-22",
@@ -159,7 +187,11 @@ export const communityPosts: CommunityPost[] = [
         views: 6700,
         allowRemix: true,
         createdAt: new Date("2024-01-28"),
-        tags: ["architecture", "minimalist", "design"]
+        tags: ["architecture", "minimalist", "design"],
+        model: "StudioX Flux Pro",
+        preset: "Photorealistic",
+        quality: "8k",
+        size: "2048x1536"
     },
     {
         id: "post-23",
@@ -179,7 +211,11 @@ export const communityPosts: CommunityPost[] = [
         views: 11000,
         allowRemix: true,
         createdAt: new Date("2024-02-03"),
-        tags: ["lofi", "3d", "isometric"]
+        tags: ["lofi", "3d", "isometric"],
+        model: "DALL·E 3",
+        preset: "Artistic",
+        quality: "4k",
+        size: "1024x1024"
     },
     {
         id: "post-24",
@@ -199,7 +235,11 @@ export const communityPosts: CommunityPost[] = [
         views: 5200,
         allowRemix: false,
         createdAt: new Date("2024-02-08"),
-        tags: ["macro", "watch", "mechanical"]
+        tags: ["macro", "watch", "mechanical"],
+        model: "Midjourney v6",
+        preset: "Photorealistic",
+        quality: "8k",
+        size: "2048x2048"
     },
     {
         id: "post-25",
@@ -219,7 +259,11 @@ export const communityPosts: CommunityPost[] = [
         views: 18200,
         allowRemix: true,
         createdAt: new Date("2024-02-12"),
-        tags: ["tokyo", "street", "neon"]
+        tags: ["tokyo", "street", "neon"],
+        model: "StudioX Flux Pro",
+        preset: "Cinematic",
+        quality: "8k",
+        size: "1536x2048"
     },
     {
         id: "post-26",
@@ -239,7 +283,11 @@ export const communityPosts: CommunityPost[] = [
         views: 3100,
         allowRemix: true,
         createdAt: new Date("2024-02-15"),
-        tags: ["lowpoly", "landscape", "3d"]
+        tags: ["lowpoly", "landscape", "3d"],
+        model: "DALL·E 3",
+        preset: "Stylized",
+        quality: "4k",
+        size: "2048x1536"
     },
     {
         id: "post-27",
@@ -259,7 +307,11 @@ export const communityPosts: CommunityPost[] = [
         views: 4500,
         allowRemix: true,
         createdAt: new Date("2024-02-16"),
-        tags: ["ghost", "gothic", "spooky"]
+        tags: ["ghost", "gothic", "spooky"],
+        model: "Midjourney v6",
+        preset: "Cinematic",
+        quality: "8k",
+        size: "1536x2048"
     },
     {
         id: "post-28",
@@ -279,7 +331,11 @@ export const communityPosts: CommunityPost[] = [
         views: 2900,
         allowRemix: true,
         createdAt: new Date("2024-02-17"),
-        tags: ["drone", "scifi", "future"]
+        tags: ["drone", "scifi", "future"],
+        model: "StudioX Flux Pro",
+        preset: "General",
+        quality: "4k",
+        size: "1024x1024"
     },
     {
         id: "post-29",
@@ -299,7 +355,11 @@ export const communityPosts: CommunityPost[] = [
         views: 42000,
         allowRemix: true,
         createdAt: new Date("2024-02-18"),
-        tags: ["space", "nebula", "galaxy"]
+        tags: ["space", "nebula", "galaxy"],
+        model: "Midjourney v6",
+        preset: "Photorealistic",
+        quality: "8k",
+        size: "2048x1536"
     },
     {
         id: "post-30",
@@ -319,7 +379,11 @@ export const communityPosts: CommunityPost[] = [
         views: 21000,
         allowRemix: true,
         createdAt: new Date("2024-02-18"),
-        tags: ["cyberpunk", "geisha", "japan"]
+        tags: ["cyberpunk", "geisha", "japan"],
+        model: "StudioX Flux Pro",
+        preset: "Artistic",
+        quality: "8k",
+        size: "1536x2048"
     },
     {
         id: "post-31",
@@ -339,7 +403,11 @@ export const communityPosts: CommunityPost[] = [
         views: 1800,
         allowRemix: true,
         createdAt: new Date("2024-02-19"),
-        tags: ["nature", "sunset", "peaceful"]
+        tags: ["nature", "sunset", "peaceful"],
+        model: "Higgsfield Soul 2.0",
+        preset: "General",
+        quality: "2k",
+        size: "2048x1536"
     },
     {
         id: "post-32",
@@ -359,7 +427,11 @@ export const communityPosts: CommunityPost[] = [
         views: 6500,
         allowRemix: true,
         createdAt: new Date("2024-02-19"),
-        tags: ["steampunk", "fantasy", "airship"]
+        tags: ["steampunk", "fantasy", "airship"],
+        model: "Midjourney v6",
+        preset: "Cinematic",
+        quality: "8k",
+        size: "2048x1536"
     },
     {
         id: "post-33",
@@ -379,7 +451,11 @@ export const communityPosts: CommunityPost[] = [
         views: 11000,
         allowRemix: false,
         createdAt: new Date("2024-02-20"),
-        tags: ["glass", "bonsai", "art"]
+        tags: ["glass", "bonsai", "art"],
+        model: "StudioX Flux Pro",
+        preset: "Artistic",
+        quality: "4k",
+        size: "1024x1024"
     },
     {
         id: "post-34",
@@ -399,7 +475,11 @@ export const communityPosts: CommunityPost[] = [
         views: 8200,
         allowRemix: true,
         createdAt: new Date("2024-02-20"),
-        tags: ["retro", "arcade", "80s"]
+        tags: ["retro", "arcade", "80s"],
+        model: "Midjourney v6",
+        preset: "Photorealistic",
+        quality: "8k",
+        size: "2048x1536"
     },
     {
         id: "post-35",
@@ -419,7 +499,11 @@ export const communityPosts: CommunityPost[] = [
         views: 4800,
         allowRemix: true,
         createdAt: new Date("2024-02-21"),
-        tags: ["ice", "cave", "nature"]
+        tags: ["ice", "cave", "nature"],
+        model: "StudioX Flux Pro",
+        preset: "Photorealistic",
+        quality: "8k",
+        size: "2048x1536"
     },
     {
         id: "post-36",
@@ -439,7 +523,11 @@ export const communityPosts: CommunityPost[] = [
         views: 14500,
         allowRemix: true,
         createdAt: new Date("2024-02-21"),
-        tags: ["apocalypse", "survivor", "gritty"]
+        tags: ["apocalypse", "survivor", "gritty"],
+        model: "Midjourney v6",
+        preset: "Cinematic",
+        quality: "8k",
+        size: "1536x2048"
     },
     {
         id: "post-37",
@@ -459,7 +547,11 @@ export const communityPosts: CommunityPost[] = [
         views: 9200,
         allowRemix: true,
         createdAt: new Date("2024-02-21"),
-        tags: ["utopia", "future", "city"]
+        tags: ["utopia", "future", "city"],
+        model: "DALL·E 3",
+        preset: "General",
+        quality: "4k",
+        size: "2048x1536"
     },
     {
         id: "post-38",
@@ -479,7 +571,11 @@ export const communityPosts: CommunityPost[] = [
         views: 7400,
         allowRemix: true,
         createdAt: new Date("2024-02-22"),
-        tags: ["magic", "fantasy", "book"]
+        tags: ["magic", "fantasy", "book"],
+        model: "StudioX Flux Pro",
+        preset: "Artistic",
+        quality: "4k",
+        size: "1024x1024"
     },
     {
         id: "post-39",
@@ -499,7 +595,11 @@ export const communityPosts: CommunityPost[] = [
         views: 3100,
         allowRemix: true,
         createdAt: new Date("2024-02-22"),
-        tags: ["alien", "botany", "macro"]
+        tags: ["alien", "botany", "macro"],
+        model: "Midjourney v6",
+        preset: "Photorealistic",
+        quality: "8k",
+        size: "2048x2048"
     },
     {
         id: "post-40",
@@ -519,7 +619,11 @@ export const communityPosts: CommunityPost[] = [
         views: 19500,
         allowRemix: true,
         createdAt: new Date("2024-02-22"),
-        tags: ["fantasy", "castle", "elves"]
+        tags: ["fantasy", "castle", "elves"],
+        model: "StudioX Flux Pro",
+        preset: "Cinematic",
+        quality: "8k",
+        size: "2048x1536"
     },
     {
         id: "post-41",
@@ -539,7 +643,11 @@ export const communityPosts: CommunityPost[] = [
         views: 12000,
         allowRemix: true,
         createdAt: new Date("2024-02-22"),
-        tags: ["synthwave", "driving", "retro"]
+        tags: ["synthwave", "driving", "retro"],
+        model: "Higgsfield Soul 2.0",
+        preset: "Stylized",
+        quality: "4k",
+        size: "2048x1536"
     },
     {
         id: "post-42",
@@ -559,7 +667,11 @@ export const communityPosts: CommunityPost[] = [
         views: 10500,
         allowRemix: true,
         createdAt: new Date("2024-02-22"),
-        tags: ["hologram", "koi", "cyberpunk"]
+        tags: ["hologram", "koi", "cyberpunk"],
+        model: "StudioX Flux Pro",
+        preset: "Artistic",
+        quality: "8k",
+        size: "2048x2048"
     },
     {
         id: "post-43",
@@ -579,7 +691,11 @@ export const communityPosts: CommunityPost[] = [
         views: 6200,
         allowRemix: false,
         createdAt: new Date("2024-02-22"),
-        tags: ["surreal", "fantasy", "floating"]
+        tags: ["surreal", "fantasy", "floating"],
+        model: "DALL·E 3",
+        preset: "Artistic",
+        quality: "4k",
+        size: "1536x2048"
     },
     {
         id: "post-44",
@@ -599,6 +715,10 @@ export const communityPosts: CommunityPost[] = [
         views: 11000,
         allowRemix: true,
         createdAt: new Date("2024-02-22"),
-        tags: ["gothic", "vampire", "cathedral"]
+        tags: ["gothic", "vampire", "cathedral"],
+        model: "Midjourney v6",
+        preset: "Cinematic",
+        quality: "8k",
+        size: "1536x2048"
     }
 ]
