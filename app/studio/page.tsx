@@ -2,10 +2,8 @@
 
 import { useState, Suspense, useEffect } from "react";
 import { ProtectedRoute } from "@/components/protected-route";
-import { StudioTopNav } from "@/components/studio/top-nav";
 import { StudioLeftPanel } from "@/components/studio/left-panel";
 import { StudioCenterCanvas, type GenerationItem } from "@/components/studio/center-canvas";
-import { StudioRightPanel } from "@/components/studio/right-panel";
 import { Loader2 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import gsap from "gsap";
@@ -24,10 +22,13 @@ function StudioLayout() {
   const searchParams = useSearchParams();
   const initMode = (searchParams.get("mode") as "image" | "video" | "templates") || "image";
 
-  const [mode, setMode] = useState<"image" | "video" | "templates">(initMode);
+  const [mode] = useState<"image" | "video" | "templates">(initMode);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generations, setGenerations] = useState<GenerationItem[]>([]);
   const [activeGeneration, setActiveGeneration] = useState<GenerationItem | null>(null);
+
+  // Shared state for framing/canvas preview
+  const [aspectRatio, setAspectRatio] = useState("16:9");
 
   // GSAP Entrance Animations
   useEffect(() => {
@@ -44,9 +45,10 @@ function StudioLayout() {
     // Simulate generation queue
     const newItem: GenerationItem = {
       id: crypto.randomUUID(),
-      type: mode === 'video' ? 'video' : 'image',
+      type: settings.mode === 'video' ? 'video' : 'image',
       prompt: prompt,
-      status: "queued"
+      status: "queued",
+      settings: settings
     };
 
     setActiveGeneration(newItem);
@@ -60,7 +62,7 @@ function StudioLayout() {
 
     // Simulate completion
     setTimeout(() => {
-      const completedItem: GenerationItem = { ...newItem, status: "completed" as const, src: mode === 'image' ? "/createcard.jpeg" : "/studiox.jpg" };
+      const completedItem: GenerationItem = { ...newItem, status: "completed" as const, src: settings.mode === 'image' ? "/createcard.jpeg" : "/studiox.jpg" };
       setActiveGeneration(completedItem);
       setGenerations((prev: GenerationItem[]) => prev.map(item => item.id === newItem.id ? completedItem : item));
       setIsGenerating(false);
@@ -68,41 +70,40 @@ function StudioLayout() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#050508] via-[#0B0B12] to-[#07070A] text-zinc-100 font-sans relative selection:bg-cyan-500/40 overflow-hidden">
-
-      {/* Background Lighting */}
+    <div className="min-h-screen bg-[#050505] text-zinc-100 font-sans relative selection:bg-cyan-500/40 overflow-hidden">
+      {/* Background Lighting & Image Layer */}
       <div className="fixed inset-0 pointer-events-none z-0">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[radial-gradient(circle,rgba(139,92,246,0.06)_0%,rgba(34,211,238,0.02)_50%,transparent_100%)] blur-[100px]" />
-        <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.03] mix-blend-overlay" />
+        <div className="absolute inset-0 bg-black/80" />
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-60 transition-all duration-[20s] ease-linear scale-105"
+          style={{ backgroundImage: `url('/studio/studio3.jpeg')` }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.1)_0%,rgba(0,0,0,0.3)_100%)] backdrop-blur-[6px]" />
       </div>
 
-      {/* Floating Top Nav */}
-      <StudioTopNav mode={mode} setMode={setMode} />
-
-      {/* Main 3-Panel Layout */}
-      <div className="relative z-10 flex w-full max-w-[1920px] mx-auto pt-[104px] px-6 gap-6 h-screen pb-6">
+      {/* Main Layout */}
+      <div className="relative z-10 flex w-full h-[calc(100vh-24px)] pt-[104px] px-6 gap-6 max-w-[2000px] mx-auto overflow-hidden">
 
         {/* Left Panel - Tool Control */}
-        <div className="studio-panel w-[320px] shrink-0 h-full flex flex-col">
+        <div className="studio-panel w-[340px] shrink-0 h-[calc(100vh-130px)] flex flex-col z-20">
           <StudioLeftPanel
             onGenerate={handleGenerate}
             isGenerating={isGenerating}
             mode={mode}
+            aspectRatio={aspectRatio}
+            setAspectRatio={setAspectRatio}
           />
         </div>
 
         {/* Center Panel - Creation Canvas (Hero) */}
-        <div className="studio-panel flex-1 h-full min-w-0 flex flex-col relative group/canvas">
+        <div className="studio-panel flex-1 h-full min-w-0 flex flex-col relative z-10">
           <StudioCenterCanvas
             activeGeneration={activeGeneration}
             mode={mode}
             isGenerating={isGenerating}
+            aspectRatio={aspectRatio}
           />
-        </div>
-
-        {/* Right Panel - History + Assets */}
-        <div className="studio-panel w-[320px] shrink-0 h-full flex flex-col">
-          <StudioRightPanel generations={generations} />
         </div>
 
       </div>
