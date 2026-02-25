@@ -1,16 +1,19 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState, Suspense, useEffect } from "react";
 import { ProtectedRoute } from "@/components/protected-route";
-import { StudioLeftPanel } from "../../components/studio/left-panel";
-import { StudioMainContent, type GenerationItem } from "../../components/studio/main-content";
+import { StudioTopNav } from "@/components/studio/top-nav";
+import { StudioLeftPanel } from "@/components/studio/left-panel";
+import { StudioCenterCanvas, type GenerationItem } from "@/components/studio/center-canvas";
+import { StudioRightPanel } from "@/components/studio/right-panel";
 import { Loader2 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
+import gsap from "gsap";
 
 export default function StudioPage() {
   return (
     <ProtectedRoute>
-      <Suspense fallback={<div className="min-h-screen bg-black flex items-center justify-center"><Loader2 className="w-6 h-6 text-zinc-500 animate-spin" /></div>}>
+      <Suspense fallback={<div className="min-h-screen bg-[#050508] flex items-center justify-center"><Loader2 className="w-6 h-6 text-violet-500 animate-spin" /></div>}>
         <StudioLayout />
       </Suspense>
     </ProtectedRoute>
@@ -19,70 +22,89 @@ export default function StudioPage() {
 
 function StudioLayout() {
   const searchParams = useSearchParams();
-  const initMode = (searchParams.get("mode") as "image" | "video") || "image";
-  const initPrompt = searchParams.get("prompt") || "";
-  const initPreviewUrl = searchParams.get("previewUrl") || "";
+  const initMode = (searchParams.get("mode") as "image" | "video" | "templates") || "image";
 
+  const [mode, setMode] = useState<"image" | "video" | "templates">(initMode);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [mode, setMode] = useState<"image" | "video">(initMode);
   const [generations, setGenerations] = useState<GenerationItem[]>([]);
+  const [activeGeneration, setActiveGeneration] = useState<GenerationItem | null>(null);
+
+  // GSAP Entrance Animations
+  useEffect(() => {
+    gsap.fromTo(
+      ".studio-panel",
+      { y: 30, opacity: 0, filter: "blur(10px)" },
+      { y: 0, opacity: 1, filter: "blur(0px)", duration: 1, stagger: 0.1, ease: "power3.out" }
+    );
+  }, []);
 
   const handleGenerate = async (prompt: string, settings: any) => {
     setIsGenerating(true);
 
-    // Create new generation item
+    // Simulate generation queue
     const newItem: GenerationItem = {
       id: crypto.randomUUID(),
-      type: mode,
+      type: mode === 'video' ? 'video' : 'image',
       prompt: prompt,
       status: "queued"
     };
 
-    // Add to list (prepend)
-    setGenerations(prev => [newItem, ...prev]);
+    setActiveGeneration(newItem);
+    setGenerations((prev: GenerationItem[]) => [newItem, ...prev]);
 
-    // Simulate generation
-    await new Promise(resolve => setTimeout(resolve, 3000));
+    // Simulate generating state
+    setTimeout(() => {
+      setActiveGeneration((prev: GenerationItem | null) => prev ? { ...prev, status: "generating" } : null);
+      setGenerations((prev: GenerationItem[]) => prev.map(item => item.id === newItem.id ? { ...item, status: "generating" } : item));
+    }, 1500);
 
-    // Update item to completed
-    setGenerations(prev => prev.map(item =>
-      item.id === newItem.id
-        ? { ...item, status: "completed", src: mode === 'image' ? "/createcard.jpeg" : "/studiox.jpg" } // using existing placeholder assets
-        : item
-    ));
-
-    setIsGenerating(false);
+    // Simulate completion
+    setTimeout(() => {
+      const completedItem: GenerationItem = { ...newItem, status: "completed" as const, src: mode === 'image' ? "/createcard.jpeg" : "/studiox.jpg" };
+      setActiveGeneration(completedItem);
+      setGenerations((prev: GenerationItem[]) => prev.map(item => item.id === newItem.id ? completedItem : item));
+      setIsGenerating(false);
+    }, 4500);
   };
 
   return (
-    <div className="min-h-screen bg-[#07080f] text-zinc-100 font-sans relative selection:bg-indigo-500/30 pb-20 overflow-x-hidden">
-      {/* Background Cinematic Gradients */}
+    <div className="min-h-screen bg-gradient-to-b from-[#050508] via-[#0B0B12] to-[#07070A] text-zinc-100 font-sans relative selection:bg-cyan-500/40 overflow-hidden">
+
+      {/* Background Lighting */}
       <div className="fixed inset-0 pointer-events-none z-0">
-        <div className="absolute top-[-20%] left-[10%] w-[50%] h-[50%] bg-blue-900/20 rounded-full blur-[150px] animate-pulse-slow" />
-        <div className="absolute top-[30%] right-[-10%] w-[40%] h-[50%] bg-indigo-800/15 rounded-full blur-[150px]" />
-        <div className="absolute bottom-[-20%] left-[30%] w-[60%] h-[60%] bg-violet-900/15 rounded-full blur-[150px]" />
-        <div className="absolute inset-0 bg-slate-950/40 pointer-events-none mix-blend-multiply" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[radial-gradient(circle,rgba(139,92,246,0.06)_0%,rgba(34,211,238,0.02)_50%,transparent_100%)] blur-[100px]" />
         <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.03] mix-blend-overlay" />
       </div>
 
-      {/* Content Area */}
-      <div className="relative z-10 flex max-w-[1920px] mx-auto pt-24 px-4 sm:px-6 lg:px-8 gap-6 min-h-screen">
-        {/* Sticky Left Sidebar */}
-        <div className="w-[420px] shrink-0 sticky top-24 self-start h-[calc(100vh-120px)] hidden lg:block rounded-3xl shadow-2xl">
+      {/* Floating Top Nav */}
+      <StudioTopNav mode={mode} setMode={setMode} />
+
+      {/* Main 3-Panel Layout */}
+      <div className="relative z-10 flex w-full max-w-[1920px] mx-auto pt-[104px] px-6 gap-6 h-screen pb-6">
+
+        {/* Left Panel - Tool Control */}
+        <div className="studio-panel w-[320px] shrink-0 h-full flex flex-col">
           <StudioLeftPanel
             onGenerate={handleGenerate}
             isGenerating={isGenerating}
             mode={mode}
-            setMode={setMode}
-            initialPrompt={initPrompt}
-            initialPreviewUrl={initPreviewUrl}
           />
         </div>
 
-        {/* Scrollable Main Content */}
-        <div className="flex-1 min-w-0 pb-12">
-          <StudioMainContent mode={mode} generations={generations} />
+        {/* Center Panel - Creation Canvas (Hero) */}
+        <div className="studio-panel flex-1 h-full min-w-0 flex flex-col relative group/canvas">
+          <StudioCenterCanvas
+            activeGeneration={activeGeneration}
+            mode={mode}
+            isGenerating={isGenerating}
+          />
         </div>
+
+        {/* Right Panel - History + Assets */}
+        <div className="studio-panel w-[320px] shrink-0 h-full flex flex-col">
+          <StudioRightPanel generations={generations} />
+        </div>
+
       </div>
     </div>
   );
