@@ -5,25 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
-import {
     ChevronDown,
     Sparkles,
-    Image as ImageIcon,
-    Video,
-    Music,
-    Box,
-    ChevronLeft,
     Upload,
-    Zap,
-    LayoutTemplate,
     Wand2,
-    Maximize2
+    Settings2,
+    SlidersHorizontal,
+    Image as ImageIcon,
+    Video
 } from "lucide-react";
 import {
     DropdownMenu,
@@ -37,314 +26,229 @@ import Image from "next/image";
 interface StudioLeftPanelProps {
     onGenerate: (prompt: string, settings: any) => void;
     isGenerating: boolean;
-    mode: "image" | "video";
-    setMode: (mode: "image" | "video") => void;
-    initialPrompt?: string;
-    initialPreviewUrl?: string;
+    mode: "image" | "video" | "templates";
 }
 
-export function StudioLeftPanel({ onGenerate, isGenerating, mode, setMode, initialPrompt = "", initialPreviewUrl = "" }: StudioLeftPanelProps) {
-    const [activeTab, setActiveTab] = useState<"create" | "variations">("create");
-    // Local mode state removed in favor of prop
-    const [prompt, setPrompt] = useState(initialPrompt);
-    const [previewUrl, setPreviewUrl] = useState(initialPreviewUrl);
+export function StudioLeftPanel({ onGenerate, isGenerating, mode }: StudioLeftPanelProps) {
+    const [subMode, setSubMode] = useState<"create" | "variations">("create");
+    const [prompt, setPrompt] = useState("");
+    const [previewUrl, setPreviewUrl] = useState("");
+    const [showAdvanced, setShowAdvanced] = useState(false);
 
-    useEffect(() => {
-        if (initialPrompt) setPrompt(initialPrompt);
-        if (initialPreviewUrl) setPreviewUrl(initialPreviewUrl);
-    }, [initialPrompt, initialPreviewUrl]);
+    const [selectedModel, setSelectedModel] = useState<"Nano" | "Sora" | "Templates">("Nano");
+    const [aspectRatio, setAspectRatio] = useState("16:9");
 
-    const [autoPolish, setAutoPolish] = useState(false);
-
-    // Local state for model selection
-    const [selectedModel, setSelectedModel] = useState<"Nano" | "OpenAI" | "Veo">("Nano");
-
-    // Reset model when mode changes
-    if (mode === 'image' && selectedModel === 'Veo') setSelectedModel('Nano');
-    // if (mode === 'video' && selectedModel !== 'Veo') setSelectedModel('Veo');
-
-    // Derived display values
     const modelDisplay = {
-        Nano: { name: "Nano", sub: "Banana Pro", icon: "G", color: "bg-zinc-800 text-white" },
-        OpenAI: { name: "OpenAI", sub: "DALL-E 3", icon: "O", color: "bg-green-600 text-white" },
-        Veo: { name: "Veo", sub: "2.0 Flash", icon: "V", color: "bg-purple-900/50 text-purple-300" }
+        Nano: { name: "Nano Banana", sub: "Fast Image", icon: "N", color: "bg-gradient-to-tr from-yellow-400 to-orange-500 text-white" },
+        Sora: { name: "Sora", sub: "Premium Video", icon: "S", color: "bg-gradient-to-tr from-cyan-400 to-blue-600 text-white" },
+        Templates: { name: "Workflows", sub: "Custom Pipes", icon: "W", color: "bg-gradient-to-tr from-fuchsia-500 to-purple-600 text-white" }
     };
 
     const currentModel = modelDisplay[selectedModel];
-
-    // Derived state based on mode
-    const aspectRatio = mode === 'video' ? "16:9" : "4:3";
-    const resolution = mode === 'video' ? "5s" : "1K";
-
-    const [outputCount, setOutputCount] = useState(1);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleGenerate = () => {
         onGenerate(prompt, {
             mode,
             model: selectedModel,
-            aspectRatio,
-            resolution,
-            outputCount,
-            autoPolish
+            aspectRatio
         });
     };
 
     return (
-        <div className="w-full h-full flex flex-col bg-[#0B0F19]/60 backdrop-blur-3xl border border-indigo-500/10 rounded-3xl relative z-20 flex-shrink-0 text-zinc-100 overflow-y-auto no-scrollbar">
-            {/* Header */}
-            <div className="h-16 flex items-center px-6 border-b border-white/5">
-                <Button variant="ghost" size="icon" className="mr-2 text-zinc-400 hover:text-white">
-                    <ChevronLeft className="w-5 h-5" />
-                </Button>
-                <h1 className="text-lg font-semibold">
-                    {activeTab === 'create'
-                        ? (mode === 'image' ? 'Create Image' : 'Create Video')
-                        : (mode === 'image' ? 'Image Variations' : 'Video Variations')}
-                </h1>
-            </div>
+        <div className="w-full h-[calc(100vh-140px)] flex flex-col bg-white/[0.05] backdrop-blur-[20px] border border-white/[0.08] shadow-[0_10px_40px_rgba(0,0,0,0.5)] rounded-[20px] relative z-20 flex-shrink-0 text-zinc-100 overflow-hidden transition-all duration-300">
 
-            <div className="p-6 flex-1 flex flex-col gap-8">
-                {/* Mode Switcher - Large & Premium */}
-                <div className="bg-[#06080D]/40 p-1.5 rounded-2xl border border-indigo-500/10 flex relative mt-2">
+            {/* Scrollable Content Area */}
+            <div className="flex-1 overflow-y-auto no-scrollbar p-5 flex flex-col gap-5">
+
+                {/* Mode Selector */}
+                <div className="bg-black/30 p-1 rounded-[14px] border border-white/[0.05] flex relative shadow-inner">
                     <div
                         className={cn(
-                            "absolute inset-y-1.5 w-[calc(50%-6px)] bg-[#1A2235] rounded-xl shadow-lg border border-indigo-500/20 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
-                            mode === 'video' ? "left-[calc(50%+3px)]" : "left-1.5"
+                            "absolute inset-y-1 w-[calc(50%-4px)] bg-white/[0.08] rounded-[10px] shadow-sm border border-white/[0.1] transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]",
+                            subMode === 'variations' ? "left-[calc(50%+2px)]" : "left-1"
                         )}
                     />
                     <button
-                        onClick={() => setMode('image')}
-                        className={cn(
-                            "flex-1 flex items-center justify-center gap-2 py-3 rounded-xl relative z-10 transition-colors duration-300",
-                            mode === 'image' ? "text-white" : "text-zinc-500 hover:text-zinc-300"
-                        )}
+                        onClick={() => setSubMode('create')}
+                        className={cn("flex-1 py-2 text-xs font-semibold relative z-10 transition-colors duration-300", subMode === 'create' ? "text-white" : "text-zinc-500 hover:text-zinc-300")}
                     >
-                        <ImageIcon className={cn("w-4 h-4", mode === 'image' ? "fill-white/20" : "")} />
-                        <span className="font-semibold text-sm">Image</span>
+                        Create
                     </button>
                     <button
-                        onClick={() => setMode('video')}
-                        className={cn(
-                            "flex-1 flex items-center justify-center gap-2 py-3 rounded-xl relative z-10 transition-colors duration-300",
-                            mode === 'video' ? "text-white" : "text-zinc-500 hover:text-zinc-300"
-                        )}
+                        onClick={() => setSubMode('variations')}
+                        className={cn("flex-1 py-2 text-xs font-semibold relative z-10 transition-colors duration-300", subMode === 'variations' ? "text-white" : "text-zinc-500 hover:text-zinc-300")}
                     >
-                        <Video className={cn("w-4 h-4", mode === 'video' ? "fill-white/20" : "")} />
-                        <span className="font-semibold text-sm">Video</span>
+                        Variations
                     </button>
                 </div>
 
-                {/* Tabs */}
-                <div className="p-1 bg-[#0D111D] rounded-xl flex gap-1">
-                    <button
-                        onClick={() => setActiveTab("create")}
-                        className={cn(
-                            "flex-1 py-3 px-4 rounded-lg text-sm font-medium transition-all flex flex-col items-center gap-2 relative overflow-hidden",
-                            activeTab === "create"
-                                ? "text-white bg-[#1A2235] shadow-lg border border-indigo-500/20"
-                                : "text-zinc-500 hover:text-zinc-300"
-                        )}
+                {/* Upload Area */}
+                <div className="space-y-2">
+                    <label className="text-xs font-semibold text-zinc-400 tracking-wide px-1 uppercase">Source Media</label>
+                    <div
+                        onClick={() => fileInputRef.current?.click()}
+                        className="w-full p-4 rounded-[16px] bg-white/[0.02] border border-white/[0.08] hover:bg-white/[0.06] hover:border-white/[0.2] transition-all duration-300 cursor-pointer flex flex-col items-center justify-center gap-3 group"
                     >
-                        {activeTab === "create" && <div className={cn("absolute inset-0 bg-gradient-to-br from-transparent", mode === 'image' ? "from-pink-500/10" : "from-blue-500/10")} />}
-                        <div className={cn(
-                            "w-8 h-8 rounded-lg flex items-center justify-center mb-1 relative z-10",
-                            activeTab === "create"
-                                ? (mode === 'image' ? "bg-pink-500 text-white" : "bg-blue-600 text-white")
-                                : "bg-zinc-800 text-zinc-600"
-                        )}>
-                            {mode === 'image' ? <Sparkles className="w-4 h-4 fill-current" /> : <Video className="w-4 h-4 fill-current" />}
-                        </div>
-                        <span className="relative z-10">{mode === 'image' ? 'Create Image' : 'Create Video'}</span>
-                    </button>
-                    <button
-                        onClick={() => setActiveTab("variations")}
-                        className={cn(
-                            "flex-1 py-3 px-4 rounded-lg text-sm font-medium transition-all flex flex-col items-center gap-2 relative overflow-hidden",
-                            activeTab === "variations"
-                                ? "text-white bg-[#1A2235] shadow-lg border border-indigo-500/20"
-                                : "text-zinc-500 hover:text-indigo-200"
+                        {previewUrl ? (
+                            <div className="w-full h-24 relative rounded-lg overflow-hidden border border-white/[0.1]">
+                                <Image src={previewUrl} alt="Preview" fill className="object-cover" />
+                                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                    <span className="text-[10px] uppercase font-bold text-white tracking-widest bg-white/20 px-3 py-1.5 rounded-full backdrop-blur-md">Change</span>
+                                </div>
+                            </div>
+                        ) : (
+                            <>
+                                <div className="w-10 h-10 rounded-full bg-white/[0.05] border border-white/[0.1] flex items-center justify-center group-hover:scale-110 group-hover:bg-white/[0.1] transition-all duration-300 shadow-sm">
+                                    <Upload className="w-4 h-4 text-cyan-400" />
+                                </div>
+                                <div className="text-center">
+                                    <div className="text-xs font-semibold text-zinc-300">Drag & Drop</div>
+                                    <div className="text-[10px] text-zinc-500 mt-1">or click to browse local files</div>
+                                </div>
+                            </>
                         )}
-                    >
-                        {activeTab === "variations" && <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent" />}
-                        <div className={cn(
-                            "w-8 h-8 rounded-lg flex items-center justify-center mb-1 relative z-10",
-                            activeTab === "variations" ? "bg-purple-500 text-white" : "bg-zinc-800 text-zinc-600"
-                        )}>
-                            <LayoutTemplate className="w-4 h-4 fill-current" />
-                        </div>
-                        <span className="relative z-10">{mode === 'image' ? 'Image Variations' : 'Video Variations'}</span>
-                    </button>
-                </div>
-
-                {/* Describe Image */}
-                <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                        <label className="text-sm font-medium text-zinc-200">Describe your {mode}</label>
-                        <Maximize2 className="w-3 h-3 text-zinc-500 cursor-pointer hover:text-zinc-300" />
+                        <input ref={fileInputRef} type="file" className="hidden" accept="image/*,video/*" />
                     </div>
+                </div>
 
-                    <div className="relative bg-[#0D111D] rounded-2xl border border-indigo-500/10 overflow-hidden group focus-within:border-indigo-500/50 transition-colors py-2">
-
-                        {/* Upload Area */}
-                        <div
-                            onClick={() => fileInputRef.current?.click()}
-                            className="mx-4 mt-2 p-2 rounded-xl border border-indigo-900/30 bg-[#131A2B] hover:bg-[#1A2235] cursor-pointer flex items-center gap-3 transition-colors"
-                        >
-                            <div className="w-8 h-8 rounded-lg bg-zinc-800 flex items-center justify-center flex-shrink-0 relative overflow-hidden">
-                                {previewUrl ? (
-                                    <video src={previewUrl} className="object-cover w-full h-full opacity-80" autoPlay loop muted playsInline />
-                                ) : mode === 'image' ? (
-                                    <Image src="/createcard.jpeg" alt="Upload" fill className="object-cover opacity-80" />
-                                ) : (
-                                    <Video className="w-4 h-4 text-zinc-400" />
-                                )}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                                <div className="text-xs font-medium text-indigo-200 truncate">Add visual references <span className="text-indigo-400 ml-1">Optional</span></div>
-                                <div className="text-[10px] text-indigo-400/70 truncate">Guide the look and keep things consistent.</div>
-                            </div>
-                            <span className="text-[10px] font-medium text-indigo-400/50">0/10</span>
-                            <input ref={fileInputRef} type="file" className="hidden" multiple accept="image/*" />
-                        </div>
-
+                {/* Prompt Input */}
+                <div className="space-y-2">
+                    <label className="text-xs font-semibold text-zinc-400 tracking-wide px-1 uppercase">Prompt</label>
+                    <div className="bg-black/20 rounded-[16px] border border-white/[0.08] focus-within:border-cyan-500/50 focus-within:bg-black/40 transition-all duration-300 overflow-hidden shadow-inner flex flex-col">
                         <Textarea
                             value={prompt}
                             onChange={(e) => setPrompt(e.target.value)}
-                            placeholder="What do you want to see? Example: 'A cat sitting on a table, warm morning light.'"
-                            className="resize-none min-h-[120px] bg-transparent border-none text-indigo-100 placeholder:text-indigo-900/40 focus-visible:ring-0 p-4 text-sm leading-relaxed"
+                            placeholder="Describe your vision in detail..."
+                            className="resize-none min-h-[120px] bg-transparent border-none text-zinc-200 placeholder:text-zinc-600 focus-visible:ring-0 px-4 py-4 text-sm leading-relaxed"
                         />
-
-                        <div className="px-4 pb-2 flex items-center justify-between">
-                            <div className="flex gap-2">
-                                <Button variant="ghost" size="icon" className="h-8 w-8 text-zinc-500 hover:text-white rounded-full hover:bg-white/10">
-                                    <Box className="w-4 h-4" />
-                                </Button>
-                                <Button variant="ghost" size="icon" className="h-8 w-8 text-zinc-500 hover:text-white rounded-full hover:bg-white/10">
-                                    <Wand2 className="w-4 h-4" />
-                                </Button>
+                        <div className="flex items-center justify-between p-2 border-t border-white/[0.05] bg-white/[0.02]">
+                            <Button variant="ghost" size="icon" className="h-8 w-8 text-zinc-400 hover:text-white rounded-lg hover:bg-white/[0.1] transition-colors">
+                                <Wand2 className="w-4 h-4" />
+                            </Button>
+                            <div className="flex items-center gap-2 bg-white/[0.05] px-3 py-1 rounded-full border border-white/[0.05]">
+                                <span className="text-[10px] font-bold tracking-wider text-zinc-300 uppercase">Enhance</span>
+                                <Switch className="scale-[0.6] data-[state=checked]:bg-cyan-500" />
                             </div>
-
-                            <div className="flex items-center gap-3">
-                                <span className="text-xs font-medium text-zinc-400">Auto Polish</span>
-                                <Switch checked={autoPolish} onCheckedChange={setAutoPolish} className="scale-75 data-[state=checked]:bg-zinc-200" />
-                            </div>
-                        </div>
-
-                        {/* Random Prompt Button */}
-                        <div className="absolute right-4 bottom-20">
-                            <button className="w-8 h-8 rounded-full bg-orange-500 hover:bg-orange-400 flex items-center justify-center transition-colors shadow-lg shadow-orange-500/20 translate-y-1/2">
-                                <Zap className="w-4 h-4 text-black fill-current" />
-                            </button>
                         </div>
                     </div>
                 </div>
 
-                {/* Adjust Settings - MATCHING SCREENSHOT */}
-                <div className="space-y-4">
-                    <label className="text-sm font-semibold text-zinc-200">Adjust Settings</label>
-                    <div className="grid grid-cols-2 gap-3">
-                        {/* Model Selector */}
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <div className="p-4 bg-[#0D111D] rounded-2xl border border-indigo-500/10 flex flex-col justify-between cursor-pointer hover:border-indigo-500/40 transition-colors h-24 shadow-lg shadow-black/20">
-                                    <div className="flex justify-between items-start">
-                                        <span className="text-[10px] uppercase font-bold text-zinc-500 tracking-wider">MODEL</span>
-                                        <ChevronDown className="w-3 h-3 text-zinc-600" />
+                {/* Model Selection */}
+                <div className="space-y-2">
+                    <label className="text-xs font-semibold text-zinc-400 tracking-wide px-1 uppercase">Compute Model</label>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <div className="w-full p-3 bg-white/[0.03] rounded-[16px] border border-white/[0.08] hover:bg-white/[0.08] hover:border-white/[0.2] transition-all duration-300 cursor-pointer flex items-center justify-between group shadow-sm">
+                                <div className="flex items-center gap-3">
+                                    <div className={cn("w-8 h-8 rounded-[10px] flex items-center justify-center text-[11px] font-extrabold shadow-md", currentModel.color)}>
+                                        {currentModel.icon}
                                     </div>
-                                    <div className="flex items-center gap-3">
-                                        <div className={cn("w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold", currentModel.color)}>
-                                            {currentModel.icon}
-                                        </div>
-                                        <div className="flex flex-col leading-tight">
-                                            <span className="text-sm font-semibold text-white">{currentModel.name}</span>
-                                            <span className="text-[10px] text-zinc-500 font-medium">{currentModel.sub}</span>
-                                        </div>
+                                    <div className="flex flex-col text-left">
+                                        <span className="text-sm font-bold text-zinc-100">{currentModel.name}</span>
+                                        <span className="text-[10px] text-zinc-500 font-medium">{currentModel.sub}</span>
                                     </div>
                                 </div>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="start" className="w-[180px] bg-[#0D111D] border-indigo-500/20 text-indigo-100 shadow-xl shadow-black/40">
-                                <>
-                                    <DropdownMenuItem onClick={() => setSelectedModel("Nano")} className="hover:bg-white/5 cursor-pointer flex gap-2">
-                                        <div className="w-4 h-4 rounded-full bg-zinc-800 text-white flex items-center justify-center text-[8px] font-bold">G</div>
-                                        <div className="flex flex-col">
-                                            <span className="text-xs font-semibold">Nano</span>
-                                            <span className="text-[8px] text-zinc-500">Banana Pro</span>
-                                        </div>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => setSelectedModel("OpenAI")} className="hover:bg-white/5 cursor-pointer flex gap-2">
-                                        <div className="w-4 h-4 rounded-full bg-green-600 text-white flex items-center justify-center text-[8px] font-bold">O</div>
-                                        <div className="flex flex-col">
-                                            <span className="text-xs font-semibold">OpenAI</span>
-                                            <span className="text-[8px] text-zinc-500">DALL-E 3</span>
-                                        </div>
-                                    </DropdownMenuItem>
-                                    {mode === 'video' && (
-                                        <DropdownMenuItem onClick={() => setSelectedModel("Veo")} className="hover:bg-white/5 cursor-pointer flex gap-2">
-                                            <div className="w-4 h-4 rounded-full bg-purple-900/50 text-purple-300 flex items-center justify-center text-[8px] font-bold">V</div>
-                                            <div className="flex flex-col">
-                                                <span className="text-xs font-semibold">Veo</span>
-                                                <span className="text-[8px] text-zinc-500">2.0 Flash</span>
-                                            </div>
-                                        </DropdownMenuItem>
-                                    )}
-                                </>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
+                                <ChevronDown className="w-4 h-4 text-zinc-500 group-hover:text-zinc-300 transition-colors" />
+                            </div>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="start" className="w-[280px] bg-[#0A0A0A]/95 backdrop-blur-3xl border border-white/[0.1] text-white shadow-[0_20px_60px_rgba(0,0,0,0.8)] rounded-[16px] p-2">
+                            <DropdownMenuItem onClick={() => setSelectedModel("Nano")} className="hover:bg-white/[0.08] focus:bg-white/[0.08] cursor-pointer flex gap-3 p-3 rounded-[12px] transition-colors">
+                                <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-yellow-400 to-orange-500 flex items-center justify-center shadow-md">
+                                    <ImageIcon className="w-5 h-5 text-white" />
+                                </div>
+                                <div className="flex flex-col justify-center">
+                                    <span className="text-[13px] font-bold text-white">Nano Banana</span>
+                                    <span className="text-[10px] font-medium text-yellow-500 flex items-center gap-1">⚡ Fast Image • 10 Credits</span>
+                                </div>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => setSelectedModel("Sora")} className="hover:bg-white/[0.08] focus:bg-white/[0.08] cursor-pointer flex gap-3 p-3 rounded-[12px] transition-colors mt-1">
+                                <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-400 to-blue-600 flex items-center justify-center shadow-md">
+                                    <Video className="w-5 h-5 text-white" />
+                                </div>
+                                <div className="flex flex-col justify-center">
+                                    <span className="text-[13px] font-bold text-white">Sora</span>
+                                    <span className="text-[10px] font-medium text-cyan-400 flex items-center gap-1">✨ Premium Video • 80 Credits</span>
+                                </div>
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
 
-                        {/* Output Settings Display */}
-                        <div className="p-4 bg-[#0D111D] rounded-2xl border border-indigo-500/10 flex flex-col justify-between cursor-pointer hover:border-indigo-500/40 transition-colors h-24 shadow-lg shadow-black/20">
-                            <span className="text-[10px] uppercase font-bold text-zinc-500 tracking-wider">OUTPUT</span>
-                            <div className="flex items-center gap-2">
-                                <LayoutTemplate className="w-5 h-5 text-zinc-500" />
-                                <span className="text-sm font-semibold text-white">{aspectRatio} <span className="text-zinc-600 mx-1">|</span> {resolution}</span>
+                {/* Advanced Settings */}
+                <div className="space-y-3 pt-2">
+                    <button
+                        onClick={() => setShowAdvanced(!showAdvanced)}
+                        className="flex items-center gap-2 text-xs font-semibold text-zinc-400 hover:text-zinc-200 transition-colors px-1"
+                    >
+                        <SlidersHorizontal className="w-3.5 h-3.5" />
+                        Advanced Options
+                    </button>
+
+                    {showAdvanced && (
+                        <div className="p-4 bg-black/20 rounded-[16px] border border-white/[0.05] shadow-inner space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                            <div className="space-y-2">
+                                <label className="text-[10px] uppercase font-bold text-zinc-500 tracking-wider">Aspect Ratio</label>
+                                <div className="grid grid-cols-4 gap-2">
+                                    {["1:1", "4:3", "3:2", "16:9"].map((ratio) => (
+                                        <button
+                                            key={ratio}
+                                            onClick={() => setAspectRatio(ratio)}
+                                            className={cn(
+                                                "py-1.5 rounded-lg text-xs font-semibold transition-all duration-300 border",
+                                                aspectRatio === ratio
+                                                    ? "bg-cyan-500/20 text-cyan-300 border-cyan-500/50 shadow-[0_0_15px_rgba(34,211,238,0.2)]"
+                                                    : "bg-white/[0.02] text-zinc-500 border-white/[0.05] hover:bg-white/[0.08] hover:text-zinc-300"
+                                            )}
+                                        >
+                                            {ratio}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                            {/* Dummy sliders for visual effect */}
+                            <div className="space-y-2">
+                                <div className="flex justify-between text-[10px] uppercase font-bold text-zinc-500 tracking-wider">
+                                    <span>Guidance Scale</span>
+                                    <span className="text-zinc-300">7.5</span>
+                                </div>
+                                <div className="h-1.5 w-full bg-white/[0.1] rounded-full overflow-hidden">
+                                    <div className="h-full w-[75%] bg-gradient-to-r from-violet-500 to-cyan-400 rounded-full" />
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-
-                {/* Count & Generate */}
-                <div className="flex gap-3 items-stretch h-14">
-                    <div className="flex items-center gap-4 bg-[#0D111D] px-5 rounded-2xl border border-indigo-500/10 shadow-lg shadow-black/20">
-                        <button
-                            onClick={() => setOutputCount(Math.max(1, outputCount - 1))}
-                            className="text-zinc-500 hover:text-white transition-colors text-lg"
-                        >
-                            -
-                        </button>
-                        <span className="text-sm font-semibold w-4 text-center text-white">{outputCount}/4</span>
-                        <button
-                            onClick={() => setOutputCount(Math.min(4, outputCount + 1))}
-                            className="text-zinc-500 hover:text-white transition-colors text-lg"
-                        >
-                            +
-                        </button>
-                    </div>
-
-                    <Button
-                        onClick={handleGenerate}
-                        disabled={isGenerating || !prompt}
-                        className={cn(
-                            "flex-1 rounded-2xl text-base font-semibold shadow-xl border-0 transition-all active:scale-[0.98]",
-                            mode === 'image'
-                                ? "bg-gradient-to-r from-[#d9005c] to-[#9d00c6] hover:from-[#c20052] hover:to-[#8a00ae] shadow-pink-900/20"
-                                : "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 shadow-blue-900/20"
-                        )}
-                    >
-                        {isGenerating ? "Generating..." : (
-                            <span className="flex items-center gap-2">Generate <Sparkles className="w-4 h-4 fill-current text-yellow-300" /> 80</span>
-                        )}
-                    </Button>
-                </div>
-
-            </div>
-
-            {/* Footer Navigation - Removed Mode Switcher */}
-            <div className="mt-auto px-6 py-4 flex justify-end items-center bg-black/20 border-t border-white/5">
-                <div className="flex gap-3 text-zinc-600">
-                    <Button variant="ghost" size="icon" className="w-8 h-8 hover:text-white rounded-full"><Maximize2 className="w-4 h-4" /></Button>
+                    )}
                 </div>
             </div>
+
+            {/* Sticky Action Footer */}
+            <div className="flex-shrink-0 p-4 border-t border-white/[0.08] bg-white/[0.02] backdrop-blur-md z-30">
+                <Button
+                    onClick={handleGenerate}
+                    disabled={isGenerating || !prompt}
+                    className={cn(
+                        "w-full h-12 rounded-[14px] text-sm font-extrabold tracking-wide transition-all duration-300 overflow-hidden relative group",
+                        isGenerating || !prompt
+                            ? "bg-white/[0.05] text-zinc-500 border border-white/[0.05] shadow-none cursor-not-allowed"
+                            : "bg-gradient-to-r from-violet-600 to-cyan-500 text-white shadow-[0_0_30px_rgba(139,92,246,0.3)] hover:shadow-[0_0_40px_rgba(34,211,238,0.4)] border border-white/20 active:scale-[0.98]"
+                    )}
+                >
+                    <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+
+                    {isGenerating ? (
+                        <span className="flex items-center gap-2 relative z-10 animate-pulse text-cyan-100">
+                            Synthesizing...
+                        </span>
+                    ) : (
+                        <span className="flex items-center justify-center gap-2 relative z-10">
+                            <Sparkles className="w-4 h-4" />
+                            {subMode === 'create' ? 'Generate' : 'Variate'}
+                        </span>
+                    )}
+                </Button>
+            </div>
+
         </div>
     );
 }
+
