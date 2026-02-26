@@ -102,24 +102,24 @@ export function Navbar() {
             }}
             className="flex items-center gap-3 group relative z-[110]"
           >
-            <div className="relative w-8 h-8 flex items-center justify-center bg-white text-black rounded-lg overflow-hidden transition-transform duration-500">
-              <div className="absolute inset-0 bg-gradient-to-tr from-zinc-200 to-white opacity-100" />
+            <div className="relative w-8 h-8 flex items-center justify-center bg-zinc-900 text-white rounded-lg overflow-hidden transition-transform duration-500">
+              <div className="absolute inset-0 bg-gradient-to-tr from-zinc-800 to-zinc-900 opacity-100" />
               <span className="relative font-bold text-sm tracking-tighter">Sx</span>
             </div>
             <span className={cn(
               "font-medium tracking-wide transition-colors duration-300",
-              "text-white"
+              "text-zinc-900"
             )}>
               StudioX
             </span>
           </Link>
 
           {/* Desktop Navigation Capsule */}
-          <nav ref={navRef} className="hidden md:flex items-center gap-1 p-1.5 rounded-full bg-white/5 backdrop-blur-[32px] border border-white/10 shadow-[0_8px_32px_0_rgba(255,255,255,0.02)] absolute left-1/2 -translate-x-1/2 z-[110]">
+          <nav ref={navRef} className="hidden md:flex items-center gap-1 p-1.5 rounded-full bg-white/80 backdrop-blur-[32px] border border-black/[0.06] shadow-[0_4px_24px_0_rgba(0,0,0,0.06)] absolute left-1/2 -translate-x-1/2 z-[110]">
 
             {/* Smooth Sliding Pill */}
             <div
-              className="absolute top-1.5 bottom-1.5 rounded-full bg-gradient-to-tr from-white to-zinc-200 shadow-md pointer-events-none transition-all duration-500 ease-[0.32,0.72,0,1]"
+              className="absolute top-1.5 bottom-1.5 rounded-full bg-zinc-900 shadow-md pointer-events-none transition-all duration-500 ease-[0.32,0.72,0,1]"
               style={{
                 left: pillStyle.left,
                 width: pillStyle.width,
@@ -139,7 +139,7 @@ export function Navbar() {
                   data-active={isActive}
                   className={cn(
                     "relative px-5 py-2 text-sm font-medium transition-colors duration-300 rounded-full z-10",
-                    isActive ? "text-black" : "text-zinc-400 hover:text-white hover:bg-white/5"
+                    isActive ? "text-white" : "text-zinc-500 hover:text-zinc-900 hover:bg-black/[0.03]"
                   )}
                 >
                   {link.label}
@@ -151,7 +151,7 @@ export function Navbar() {
           {/* Right Section */}
           <div className="flex items-center gap-4 relative z-[110]">
             {/* Credits Pill */}
-            <div className="hidden sm:flex items-center gap-2 pl-1 pr-3 py-1 rounded-full bg-zinc-900/80 border border-white/10 shadow-lg backdrop-blur-md">
+            <div className="hidden sm:flex items-center gap-2 pl-1 pr-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 shadow-md">
               <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center">
                 <Sparkles className="w-3 h-3 text-white fill-white" />
               </div>
@@ -215,7 +215,7 @@ export function Navbar() {
               </DropdownMenu>
             ) : (
               <div className="hidden md:block">
-                <Button asChild className="rounded-full px-6 bg-white text-black hover:bg-zinc-200 hover:scale-105 transition-all duration-300 font-semibold text-sm h-10">
+                <Button asChild className="rounded-full px-6 bg-zinc-900 text-white hover:bg-zinc-800 hover:scale-105 transition-all duration-300 font-semibold text-sm h-10 shadow-md">
                   <Link href="/login">Get Started</Link>
                 </Button>
               </div>

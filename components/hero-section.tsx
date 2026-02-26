@@ -152,7 +152,7 @@ export function HeroSection() {
                             <Sparkles className="h-3.5 w-3.5 text-zinc-500" />
                             <span className="min-w-[200px] text-left">
                                 <Typewriter
-                                    text="Next Gen Creative Studio"
+                                    text="The Future Of Creation"
                                     delay={1500}
                                     speed={70}
                                     cursorClassName="bg-zinc-500"
