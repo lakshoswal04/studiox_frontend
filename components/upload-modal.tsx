@@ -98,7 +98,7 @@ export function UploadModal({ isOpen, onClose }: UploadModalProps) {
                         exit={{ opacity: 0, scale: 0.95, y: 20 }}
                         className="fixed left-1/2 top-1/2 z-50 w-full max-w-3xl -translate-x-1/2 -translate-y-1/2 p-4"
                     >
-                        <div className="relative overflow-hidden rounded-3xl shadow-2xl group">
+                        <div className="relative overflow-hidden rounded-3xl shadow-2xl group max-h-[90vh] overflow-y-auto">
                             {/* Background Image with Parallax-like fixity (or just cover) */}
                             <div className="absolute inset-0 z-0">
                                 <img src="/community_card.jpeg" alt="bg" className="w-full h-full object-cover opacity-60" />
@@ -106,7 +106,7 @@ export function UploadModal({ isOpen, onClose }: UploadModalProps) {
                                 <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60" />
                             </div>
 
-                            <div className="relative z-10 flex flex-col md:flex-row h-[600px]">
+                            <div className="relative z-10 flex flex-col md:flex-row min-h-[500px] md:h-[600px]">
                                 {/* Left: Preview / Upload Area - Glassy & Featured */}
                                 <div
                                     className={cn(

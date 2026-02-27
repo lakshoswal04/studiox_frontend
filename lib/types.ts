@@ -46,9 +46,15 @@ export interface PricingPlan {
   id: string
   name: string
   price: number
+  yearlyPrice: number
   credits: number
+  creditsPerYear: number
+  generationValue: number
   features: string[]
   popular?: boolean
+  queuePriority: string
+  support: string
+  bestFor: string
 }
 
 export interface Creation {
