@@ -50,8 +50,8 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className="dark">
-      <body className={`${inter.variable} ${playfair.variable} font-sans antialiased`}>
+    <html lang="en" className="dark" suppressHydrationWarning>
+      <body className={`${inter.variable} ${playfair.variable} font-sans antialiased`} suppressHydrationWarning>
         <AuthProvider>
           <SmoothScroll>
             <Navbar />
