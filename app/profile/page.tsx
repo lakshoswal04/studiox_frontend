@@ -62,7 +62,7 @@ function ProfileContent() {
   ]
 
   // Fallback for display name if not set
-  const displayName = user?.user_metadata?.name || user?.user_metadata?.full_name || user?.email?.split('@')[0] || "StudioX User"
+  const displayName = user?.displayName || user?.email?.split('@')[0] || "StudioX User"
   const initials = displayName.substring(0, 2).toUpperCase()
 
   return (
@@ -100,13 +100,7 @@ function ProfileContent() {
               <div className="h-40 w-40 md:h-48 md:w-48 rounded-full p-1.5 bg-[#050505]/50 backdrop-blur-xl ring-1 ring-white/10 relative z-20 overflow-hidden shadow-2xl shadow-black/50">
                 <Avatar className="h-full w-full rounded-full bg-black">
                   <AvatarImage
-                    src={
-                      user?.user_metadata?.avatar_url ||
-                      user?.user_metadata?.picture ||
-                      user?.identities?.[0]?.identity_data?.avatar_url ||
-                      user?.identities?.[0]?.identity_data?.picture ||
-                      ""
-                    }
+                    src={user?.photoURL || ""}
                     className="object-cover"
                   />
                   <AvatarFallback className="bg-gradient-to-br from-neutral-800 to-neutral-900 text-3xl font-black text-neutral-500">{initials}</AvatarFallback>
