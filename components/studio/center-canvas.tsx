@@ -43,33 +43,41 @@ export function StudioCenterCanvas({ activeGeneration, mode, isGenerating, aspec
         switch (ratio) {
             case "1:1": return "aspect-square";
             case "4:3": return "aspect-[4/3]";
-            case "3:2": return "aspect-[3/2]";
-            case "16:9": return "aspect-[16/9]";
-            default: return "aspect-[16/9]";
+            case "16:9": return "aspect-video";
+            case "9:16": return "aspect-[9/16]";
+            default: return "aspect-video";
         }
     };
+
+    const currentRatio = activeGeneration?.settings?.aspectRatio || aspectRatio;
+    let maxWidthStyle = "850px";
+    if (currentRatio === "9:16") maxWidthStyle = "min(500px, calc((100vh - 180px) * 9 / 16))";
+    else if (currentRatio === "1:1") maxWidthStyle = "min(700px, calc(100vh - 180px))";
+    else if (currentRatio === "4:3") maxWidthStyle = "min(850px, calc((100vh - 180px) * 4 / 3))";
 
     return (
         <div className="w-full h-full flex items-center justify-center p-4">
             <div
                 className={cn(
-                    "w-full max-w-[1000px] rounded-[32px] relative overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] flex flex-col items-center justify-center",
-                    getAspectRatioClass(activeGeneration?.settings?.aspectRatio || aspectRatio),
+                    "w-full rounded-[32px] relative overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] flex flex-col items-center justify-center shrink-0",
+                    getAspectRatioClass(currentRatio),
                     activeGeneration?.status === "completed"
                         ? "shadow-[0_40px_80px_rgba(0,0,0,0.8)] border border-white/[0.05] bg-black"
-                        : "border border-white/[0.04] shadow-[0_20px_60px_rgba(0,0,0,0.6)] group"
+                        : "border border-white/[0.04] shadow-[0_20px_60px_rgba(0,0,0,0.6)] group bg-[#0a0a0c]/40 backdrop-blur-3xl"
                 )}
+                style={{ maxWidth: maxWidthStyle, maxHeight: "calc(100vh - 180px)" }}
             >
                 {/* Idle Background Image Layer */}
                 {activeGeneration?.status !== "completed" && (
                     <div className="absolute inset-0 z-0">
                         <div
-                            className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-[40s] ease-linear group-hover:scale-110 scale-100"
+                            className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-[40s] ease-linear group-hover:scale-110 scale-100 opacity-60 mix-blend-screen"
                             style={{ backgroundImage: `url('/studio/studio1.jpeg')` }}
                         />
                         {/* Overlays to make it clean and readable */}
                         <div className="absolute inset-0 bg-black/60 backdrop-blur-md" />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/40" />
+                        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.03)_0%,transparent_100%)] mix-blend-overlay" />
                     </div>
                 )}
 
@@ -99,12 +107,12 @@ export function StudioCenterCanvas({ activeGeneration, mode, isGenerating, aspec
                 </div>
 
                 {isGenerating && activeGeneration?.status !== 'completed' && (
-                    <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-[#050505]/80 backdrop-blur-xl">
+                    <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-[#050505]/70 backdrop-blur-[30px]">
                         <div className="relative flex items-center justify-center mb-6">
-                            <div className="absolute inset-0 rounded-full blur-xl bg-white/10 animate-pulse" />
+                            <div className="absolute inset-0 rounded-full blur-xl bg-indigo-500/30 animate-pulse-slow" />
                             <Loader2 className="w-8 h-8 text-white animate-spin relative z-10" />
                         </div>
-                        <span className="text-xs font-semibold tracking-[0.3em] text-zinc-400 uppercase animate-pulse">
+                        <span className="text-[11px] font-bold tracking-[0.3em] text-white/80 uppercase animate-pulse">
                             Rendering
                         </span>
                     </div>
