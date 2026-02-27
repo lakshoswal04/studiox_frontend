@@ -102,24 +102,24 @@ export function Navbar() {
             }}
             className="flex items-center gap-3 group relative z-[110]"
           >
-            <div className="relative w-8 h-8 flex items-center justify-center bg-zinc-900 text-white rounded-lg overflow-hidden transition-transform duration-500">
-              <div className="absolute inset-0 bg-gradient-to-tr from-zinc-800 to-zinc-900 opacity-100" />
+            <div className="relative w-8 h-8 flex items-center justify-center bg-white text-black rounded-lg overflow-hidden transition-transform duration-500">
+              <div className="absolute inset-0 bg-gradient-to-tr from-zinc-200 to-white opacity-100" />
               <span className="relative font-bold text-sm tracking-tighter">Sx</span>
             </div>
             <span className={cn(
               "font-medium tracking-wide transition-colors duration-300",
-              "text-zinc-900"
+              "text-white"
             )}>
               StudioX
             </span>
           </Link>
 
           {/* Desktop Navigation Capsule */}
-          <nav ref={navRef} className="hidden md:flex items-center gap-1 p-1.5 rounded-full bg-white/80 backdrop-blur-[32px] border border-black/[0.06] shadow-[0_4px_24px_0_rgba(0,0,0,0.06)] absolute left-1/2 -translate-x-1/2 z-[110]">
+          <nav ref={navRef} className="hidden md:flex items-center gap-1 p-1.5 rounded-full bg-white/5 backdrop-blur-[32px] border border-white/10 shadow-[0_8px_32px_0_rgba(255,255,255,0.02)] absolute left-1/2 -translate-x-1/2 z-[110]">
 
             {/* Smooth Sliding Pill */}
             <div
-              className="absolute top-1.5 bottom-1.5 rounded-full bg-zinc-900 shadow-md pointer-events-none transition-all duration-500 ease-[0.32,0.72,0,1]"
+              className="absolute top-1.5 bottom-1.5 rounded-full bg-gradient-to-tr from-white to-zinc-200 shadow-md pointer-events-none transition-all duration-500 ease-[0.32,0.72,0,1]"
               style={{
                 left: pillStyle.left,
                 width: pillStyle.width,
@@ -139,7 +139,7 @@ export function Navbar() {
                   data-active={isActive}
                   className={cn(
                     "relative px-5 py-2 text-sm font-medium transition-colors duration-300 rounded-full z-10",
-                    isActive ? "text-white" : "text-zinc-500 hover:text-zinc-900 hover:bg-black/[0.03]"
+                    isActive ? "text-black" : "text-zinc-400 hover:text-white hover:bg-white/5"
                   )}
                 >
                   {link.label}
@@ -151,7 +151,7 @@ export function Navbar() {
           {/* Right Section */}
           <div className="flex items-center gap-4 relative z-[110]">
             {/* Credits Pill */}
-            <div className="hidden sm:flex items-center gap-2 pl-1 pr-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 shadow-md">
+            <div className="hidden sm:flex items-center gap-2 pl-1 pr-3 py-1 rounded-full bg-zinc-900/80 border border-white/10 shadow-lg backdrop-blur-md">
               <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center">
                 <Sparkles className="w-3 h-3 text-white fill-white" />
               </div>
@@ -164,9 +164,9 @@ export function Navbar() {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon" className="hidden md:flex rounded-full w-10 h-10 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all">
                     <div className="h-full w-full rounded-full overflow-hidden bg-zinc-800 flex items-center justify-center">
-                      {(user.user_metadata?.avatar_url || user.user_metadata?.picture || user.identities?.[0]?.identity_data?.avatar_url || user.identities?.[0]?.identity_data?.picture) ? (
+                      {user.photoURL ? (
                         <img
-                          src={user.user_metadata?.avatar_url || user.user_metadata?.picture || user.identities?.[0]?.identity_data?.avatar_url || user.identities?.[0]?.identity_data?.picture}
+                          src={user.photoURL}
                           alt="Profile"
                           className="w-full h-full object-cover"
                           referrerPolicy="no-referrer"
@@ -181,7 +181,7 @@ export function Navbar() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-64 p-2 bg-[#0A0A0A] border-white/10 backdrop-blur-2xl shadow-2xl rounded-2xl mt-2 animate-in fade-in zoom-in-95 duration-200">
                   <div className="px-4 py-3 border-b border-white/5 mb-2">
-                    <p className="font-medium text-sm text-white">{user.user_metadata?.full_name || "Creator"}</p>
+                    <p className="font-medium text-sm text-white">{user.displayName || "Creator"}</p>
                     <p className="text-xs text-zinc-500 truncate mt-0.5">{user.email}</p>
                   </div>
 
@@ -215,7 +215,7 @@ export function Navbar() {
               </DropdownMenu>
             ) : (
               <div className="hidden md:block">
-                <Button asChild className="rounded-full px-6 bg-zinc-900 text-white hover:bg-zinc-800 hover:scale-105 transition-all duration-300 font-semibold text-sm h-10 shadow-md">
+                <Button asChild className="rounded-full px-6 bg-white text-black hover:bg-zinc-200 hover:scale-105 transition-all duration-300 font-semibold text-sm h-10">
                   <Link href="/login">Get Started</Link>
                 </Button>
               </div>
@@ -310,9 +310,9 @@ export function Navbar() {
                     <>
                       <div className="flex items-center gap-4 mb-6">
                         <div className="w-12 h-12 rounded-full overflow-hidden bg-zinc-800 flex items-center justify-center border border-white/10 shrink-0">
-                          {(user.user_metadata?.avatar_url || user.user_metadata?.picture || user.identities?.[0]?.identity_data?.avatar_url || user.identities?.[0]?.identity_data?.picture) ? (
+                          {user.photoURL ? (
                             <img
-                              src={user.user_metadata?.avatar_url || user.user_metadata?.picture || user.identities?.[0]?.identity_data?.avatar_url || user.identities?.[0]?.identity_data?.picture}
+                              src={user.photoURL}
                               alt="Profile"
                               className="w-full h-full object-cover"
                               referrerPolicy="no-referrer"
@@ -324,7 +324,7 @@ export function Navbar() {
                           )}
                         </div>
                         <div>
-                          <p className="text-white font-medium text-lg">{user.user_metadata?.full_name}</p>
+                          <p className="text-white font-medium text-lg">{user.displayName}</p>
                           <p className="text-zinc-500 text-sm">{user.email}</p>
                         </div>
                       </div>
