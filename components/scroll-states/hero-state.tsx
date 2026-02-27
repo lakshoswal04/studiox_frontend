@@ -47,7 +47,6 @@ export function HeroState({ register }: HeroStateProps) {
     const containerRef = useRef<HTMLDivElement>(null)
     const contentRef = useRef<HTMLDivElement>(null)
     const headingRef = useRef<HTMLHeadingElement>(null)
-    const subRef = useRef<HTMLDivElement>(null)
     const descRef = useRef<HTMLParagraphElement>(null)
     const buttonsRef = useRef<HTMLDivElement>(null)
     const canvasRef = useRef<HTMLDivElement>(null)
@@ -193,9 +192,8 @@ export function HeroState({ register }: HeroStateProps) {
     useLayoutEffect(() => {
         const ctx = gsap.context(() => {
             const tl = gsap.timeline({ defaults: { ease: "power3.out" } })
-            gsap.set([subRef.current, headingRef.current, descRef.current, buttonsRef.current], { opacity: 0, y: 30 })
-            tl.to(subRef.current, { opacity: 1, y: 0, duration: 0.6 })
-                .to(headingRef.current, { opacity: 1, y: 0, duration: 0.8 }, "-=0.3")
+            gsap.set([headingRef.current, descRef.current, buttonsRef.current], { opacity: 0, y: 30 })
+            tl.to(headingRef.current, { opacity: 1, y: 0, duration: 0.8 })
                 .to(descRef.current, { opacity: 1, y: 0, duration: 0.7 }, "-=0.4")
                 .to(buttonsRef.current, { opacity: 1, y: 0, duration: 0.7 }, "-=0.4")
         }, containerRef)
@@ -255,7 +253,7 @@ export function HeroState({ register }: HeroStateProps) {
     return (
         <section
             ref={containerRef}
-            className="md:absolute md:inset-0 relative w-full h-auto min-h-[100svh] flex items-center justify-center overflow-hidden pointer-events-none bg-white"
+            className="md:absolute md:inset-0 relative w-full h-auto min-h-[100svh] flex items-center justify-center overflow-hidden pointer-events-none bg-white pt-20 pb-32"
         >
             {/* Ambient glows */}
             <div className="absolute inset-0 pointer-events-none">
@@ -304,21 +302,13 @@ export function HeroState({ register }: HeroStateProps) {
 
             {/* Content */}
             <div ref={contentRef} className="relative z-20 w-full max-w-6xl mx-auto px-6 sm:px-8 lg:px-12 will-change-transform">
-                <div className="mb-12 md:mb-16">
-                    <div ref={subRef} className="opacity-0 mb-6 pointer-events-auto inline-flex">
-                        <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-black/[0.08] bg-black/[0.03] backdrop-blur-sm shadow-sm">
-                            <Sparkles className="h-3.5 w-3.5 text-indigo-500 animate-pulse" />
-                            <span className="text-[11px] md:text-xs tracking-[0.2em] uppercase text-zinc-500 font-medium">
-                                <Typewriter text="The Future Of Creation" delay={800} speed={70} cursorClassName="bg-zinc-400" />
-                            </span>
-                        </div>
-                    </div>
+                <div className="mt-20 lg:mt-32 mb-12 md:mb-16 flex flex-col items-start text-left">
+
                     <h1 ref={headingRef} className="opacity-0 text-4xl sm:text-5xl md:text-6xl lg:text-[4.5rem] font-medium tracking-tight leading-[1.1] text-zinc-900 mb-6">
-                        Your AI-Native<br />Creative Studio
+                        Lightning fast creation meets<br />professional cinematic motion.
                     </h1>
                     <p ref={descRef} className="opacity-0 text-base md:text-lg text-zinc-600 max-w-xl leading-relaxed font-medium">
-                        Craft high-quality video and content in a seamless AI studio
-                        built for precision, speed, and full creative control.
+                        Half the cost and twice the quality in every single frame.
                     </p>
                     <div ref={buttonsRef} className="opacity-0 flex flex-wrap items-center gap-4 mt-8 pointer-events-auto">
                         <Button size="lg" className="h-12 px-8 rounded-lg text-sm bg-zinc-900 text-white hover:bg-zinc-800 hover:scale-[1.02] transition-all duration-300 font-semibold group shadow-lg" asChild>
@@ -489,7 +479,14 @@ export function HeroState({ register }: HeroStateProps) {
                             </div>
                             <div className="w-[200px] h-[150px] rounded-xl overflow-hidden transition-all duration-200 group-hover:shadow-xl group-active:scale-[0.97]"
                                 style={{ border: '1.5px solid rgba(244,114,182,0.2)', boxShadow: '0 4px 20px rgba(244,114,182,0.08)' }}>
-                                <img src="/seamless-animate/bg5.jpg" alt="" className="w-full h-full object-cover" />
+                                <video
+                                    src="/pinterest_video.mp4"
+                                    autoPlay
+                                    loop
+                                    muted
+                                    playsInline
+                                    className="w-full h-full object-cover"
+                                />
                             </div>
                         </div>
                     </div>

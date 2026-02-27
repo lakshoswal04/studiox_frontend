@@ -20,12 +20,13 @@ import { useAuth } from "@/context/auth-context"
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [isNavVisible, setIsNavVisible] = useState(true)
-  const [lastScrollY, setLastScrollY] = useState(0)
+  const lastScrollYRef = useRef(0)
+  const [scrolled, setScrolled] = useState(false)
   const { user, logout } = useAuth()
   const pathname = usePathname()
   const router = useRouter()
-  const navRef = useRef<HTMLElement>(null)
   const [pillStyle, setPillStyle] = useState({ left: 0, width: 0, opacity: 0 })
+  const navRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (!navRef.current) return
@@ -42,17 +43,18 @@ export function Navbar() {
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY
-      if (currentScrollY > 50 && currentScrollY > lastScrollY) {
+      if (currentScrollY > 50 && currentScrollY > lastScrollYRef.current) {
         setIsNavVisible(false)
       } else {
         setIsNavVisible(true)
       }
-      setLastScrollY(currentScrollY)
+      setScrolled(currentScrollY > 20)
+      lastScrollYRef.current = currentScrollY
     }
 
     window.addEventListener("scroll", handleScroll, { passive: true })
     return () => window.removeEventListener("scroll", handleScroll)
-  }, [lastScrollY])
+  }, [])
 
   // Lock body scroll when menu is open
   useEffect(() => {
@@ -86,11 +88,12 @@ export function Navbar() {
     <>
       <header
         className={cn(
-          "fixed top-0 left-0 right-0 z-[100] px-4 py-6 sm:px-6 lg:px-8 transition-transform duration-700 ease-[0.32,0.72,0,1]",
-          isNavVisible ? "translate-y-0" : "-translate-y-32"
+          "fixed top-0 left-0 right-0 z-[100] px-4 sm:px-6 lg:px-8 transition-all duration-700 ease-[0.32,0.72,0,1]",
+          isNavVisible ? "translate-y-0" : "-translate-y-32",
+          scrolled ? "bg-white/80 backdrop-blur-xl border-b border-black/5 py-4" : "bg-transparent py-6"
         )}
       >
-        <div className="max-w-7xl mx-auto flex items-center justify-between relative">
+        <div className="w-full flex items-center justify-between relative">
           {/* Logo */}
           <Link
             href="/"
@@ -107,8 +110,10 @@ export function Navbar() {
               <span className="relative font-bold text-sm tracking-tighter">Sx</span>
             </div>
             <span className={cn(
-              "font-medium tracking-wide transition-colors duration-300",
-              "text-white"
+              "font-medium tracking-wide transition-colors duration-300 pointer-events-none",
+              (pathname.startsWith('/studio') || pathname.startsWith('/community') || pathname.startsWith('/creations') || pathname.startsWith('/profile')) && !scrolled
+                ? "text-white"
+                : "text-zinc-900"
             )}>
               StudioX
             </span>

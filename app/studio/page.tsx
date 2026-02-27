@@ -32,11 +32,14 @@ function StudioLayout() {
 
   // GSAP Entrance Animations
   useEffect(() => {
-    gsap.fromTo(
-      ".studio-panel",
-      { y: 30, opacity: 0, filter: "blur(10px)" },
-      { y: 0, opacity: 1, filter: "blur(0px)", duration: 1, stagger: 0.1, ease: "power3.out", clearProps: "filter" }
-    );
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        ".studio-panel",
+        { y: 30, opacity: 0, filter: "blur(10px)" },
+        { y: 0, opacity: 1, filter: "blur(0px)", duration: 1, stagger: 0.1, ease: "power3.out", clearProps: "filter" }
+      );
+    });
+    return () => ctx.revert();
   }, []);
 
   const handleGenerate = async (prompt: string, settings: any) => {

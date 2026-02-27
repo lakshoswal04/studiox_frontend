@@ -42,6 +42,12 @@ export interface User {
   totalRemixes: number
 }
 
+export interface PricingTier {
+  credits: number
+  price: number
+  yearlyPrice: number
+}
+
 export interface PricingPlan {
   id: string
   name: string
@@ -55,6 +61,7 @@ export interface PricingPlan {
   queuePriority: string
   support: string
   bestFor: string
+  tiers?: PricingTier[]
 }
 
 export interface Creation {

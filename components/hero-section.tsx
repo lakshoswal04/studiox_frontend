@@ -152,10 +152,10 @@ export function HeroSection() {
                             <Sparkles className="h-3.5 w-3.5 text-zinc-500" />
                             <span className="min-w-[200px] text-left">
                                 <Typewriter
-                                    text="The Future Of Creation"
-                                    delay={1500}
+                                    text="Future-ready from day one."
+                                    delay={800}
                                     speed={70}
-                                    cursorClassName="bg-zinc-500"
+                                    cursorClassName="bg-zinc-400"
                                 />
                             </span>
                         </Badge>
@@ -163,10 +163,10 @@ export function HeroSection() {
 
                     <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-bold tracking-tight leading-[0.95] md:leading-[0.9] font-serif text-balance drop-shadow-2xl text-zinc-400/90 mix-blend-overlay w-full text-left"> {/* Greyish text with overlay blend */}
                         <div className="overflow-hidden py-2 block">
-                            <SplitText>Artistry</SplitText>
+                            <SplitText>Lightning fast creation meets</SplitText>
                         </div>
                         <div className="overflow-hidden py-2 block">
-                            <span className="text-zinc-500 italic block -ml-1 md:-ml-2"><SplitText>Reimagined</SplitText></span>
+                            <span className="text-zinc-500 italic block -ml-1 md:-ml-2"><SplitText>professional cinematic motion.</SplitText></span>
                         </div>
                     </h1>
 

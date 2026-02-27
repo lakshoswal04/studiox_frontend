@@ -10,7 +10,7 @@ interface PricingHeroProps {
 
 export function PricingHero({ billingCycle, setBillingCycle }: PricingHeroProps) {
     return (
-        <section className="relative pt-32 pb-20 px-4 overflow-hidden">
+        <section className="relative pt-44 pb-20 px-4 overflow-hidden">
             <div className="max-w-4xl mx-auto text-center relative z-10 space-y-8">
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
