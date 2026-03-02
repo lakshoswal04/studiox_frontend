@@ -10,19 +10,19 @@ interface PricingHeroProps {
 
 export function PricingHero({ billingCycle, setBillingCycle }: PricingHeroProps) {
     return (
-        <section className="relative pt-44 pb-20 px-4 overflow-hidden">
-            <div className="max-w-4xl mx-auto text-center relative z-10 space-y-8">
+        <section className="relative pt-32 md:pt-44 pb-12 md:pb-20 px-4 overflow-hidden">
+            <div className="max-w-4xl mx-auto text-center relative z-10 space-y-6 md:space-y-8">
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
                     className="space-y-5"
                 >
-                    <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-white">
+                    <h1 className="text-4xl md:text-7xl font-bold tracking-tight text-white">
                         Select your plan
                     </h1>
-                    <p className="text-lg md:text-xl text-zinc-400 max-w-2xl mx-auto leading-relaxed">
-                        The plan isn&apos;t about limits. It&apos;s about how fast you bring ideas to life.
+                    <p className="text-base md:text-xl text-zinc-400 max-w-2xl mx-auto leading-relaxed">
+                        The plan isn't about limits. It's about how fast you bring ideas to life.
                     </p>
                 </motion.div>
 

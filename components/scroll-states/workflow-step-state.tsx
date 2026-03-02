@@ -244,7 +244,7 @@ export function WorkflowStepState({ register, stepIndex, title, description, sem
     }, [register, stepIndex, startTypewriter])
 
     return (
-        <section ref={containerRef} className="md:absolute md:inset-0 relative w-full h-auto min-h-[100svh] flex flex-col items-center justify-center overflow-hidden pointer-events-none bg-black">
+        <section ref={containerRef} className="md:absolute md:inset-0 relative w-full h-auto min-h-[50svh] md:min-h-[100svh] flex flex-col items-center justify-center overflow-hidden pointer-events-none bg-black py-16 md:py-0">
 
             {/* 1. LIVING GRADIENT BACKGROUND */}
             <div
@@ -269,10 +269,10 @@ export function WorkflowStepState({ register, stepIndex, title, description, sem
                 ref={textContainerRef}
                 className="relative z-20 text-center px-4 flex flex-col items-center justify-center gap-8"
             >
-                <div className="h-24 md:h-32 flex items-center justify-center">
+                <div className="h-20 md:h-32 flex items-center justify-center">
                     <h2
                         ref={titleRef}
-                        className="text-6xl md:text-8xl font-serif text-white tracking-tight leading-none will-change-transform"
+                        className="text-5xl md:text-8xl font-serif text-white tracking-tight leading-none will-change-transform"
                     >
                         <Typewriter
                             text={title}
@@ -285,7 +285,7 @@ export function WorkflowStepState({ register, stepIndex, title, description, sem
 
                 <p
                     ref={descRef}
-                    className="text-xl md:text-2xl text-zinc-400 font-light max-w-lg leading-relaxed will-change-transform"
+                    className="text-lg md:text-2xl text-zinc-400 font-light max-w-lg leading-relaxed will-change-transform"
                 >
                     {description}
                 </p>

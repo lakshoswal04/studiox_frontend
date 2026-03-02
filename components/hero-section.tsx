@@ -145,7 +145,7 @@ export function HeroSection() {
                 {/* Overlay */}
                 <div className="hero-bg-overlay absolute inset-0 bg-background/0 z-1 pointer-events-none" />
 
-                <div className="hero-content relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-left flex flex-col items-start justify-center gap-6 md:gap-8 mt-12 md:mt-16 w-full lg:w-[800px] xl:w-[1000px] self-start md:ml-12 lg:ml-24">
+                <div className="hero-content relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-left flex flex-col items-start justify-center gap-6 md:gap-8 mt-12 md:mt-16 lg:w-[800px] xl:w-[1000px] self-start md:ml-12 lg:ml-24">
 
                     <div className="hero-badge overflow-hidden w-full text-left">
                         <Badge variant="outline" className="border-white/10 text-zinc-400 gap-2 px-6 py-2 rounded-full backdrop-blur-md bg-white/5 text-xs md:text-sm tracking-[0.2em] uppercase font-medium shadow-lg transition-all duration-500 hover:bg-white/10">
@@ -161,7 +161,7 @@ export function HeroSection() {
                         </Badge>
                     </div>
 
-                    <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-bold tracking-tight leading-[0.95] md:leading-[0.9] font-serif text-balance drop-shadow-2xl text-zinc-400/90 mix-blend-overlay w-full text-left"> {/* Greyish text with overlay blend */}
+                    <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl xl:text-9xl font-bold tracking-tight leading-[1] md:leading-[0.9] font-serif text-balance drop-shadow-2xl text-zinc-400/90 mix-blend-overlay w-full text-left"> {/* Greyish text with overlay blend */}
                         <div className="overflow-hidden py-2 block">
                             <SplitText>Lightning fast creation meets</SplitText>
                         </div>
@@ -170,18 +170,18 @@ export function HeroSection() {
                         </div>
                     </h1>
 
-                    <p className="hero-desc text-lg md:text-xl text-zinc-400 max-w-2xl leading-relaxed tracking-wide font-light drop-shadow-md w-full text-left">
+                    <p className="hero-desc text-base sm:text-lg md:text-xl text-zinc-400 max-w-2xl leading-relaxed tracking-wide font-light drop-shadow-md w-full text-left">
                         The ultimate platform for remix-based creation. Clone voices, upscale video, and generate code with a single command.
                     </p>
 
-                    <div className="flex flex-col sm:flex-row items-center sm:items-start justify-start gap-6 pt-6 w-full sm:w-auto">
-                        <Button size="lg" className="hero-btn h-14 px-10 rounded-full text-base bg-zinc-200 text-zinc-900 hover:bg-white transition-all shadow-[0_0_30px_-10px_rgba(255,255,255,0.3)] hover:shadow-[0_0_40px_-5px_rgba(255,255,255,0.5)] hover:scale-105 duration-300 w-full sm:w-auto" asChild>
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-start gap-4 sm:gap-6 pt-6 w-full sm:w-auto">
+                        <Button size="lg" className="hero-btn h-14 px-10 rounded-full text-base bg-zinc-200 text-zinc-900 hover:bg-white transition-all shadow-[0_0_30px_-10px_rgba(255,255,255,0.3)] hover:shadow-[0_0_40px_-5px_rgba(255,255,255,0.5)] hover:scale-105 duration-300 w-full sm:w-auto flex-1 sm:flex-none" asChild>
                             <a href="/studio">
                                 Start Creating
                                 <ArrowRight className="ml-2 h-4 w-4" />
                             </a>
                         </Button>
-                        <Button size="lg" variant="outline" className="hero-btn h-14 px-10 rounded-full text-base bg-white/5 backdrop-blur-md border-white/10 hover:bg-white/10 transition-all hover:scale-105 duration-300 text-zinc-300 w-full sm:w-auto" asChild>
+                        <Button size="lg" variant="outline" className="hero-btn h-14 px-10 rounded-full text-base bg-white/5 backdrop-blur-md border-white/10 hover:bg-white/10 transition-all hover:scale-105 duration-300 text-zinc-300 w-full sm:w-auto flex-1 sm:flex-none" asChild>
                             <a href="/community">
                                 <Play className="mr-2 h-4 w-4" />
                                 Showreel

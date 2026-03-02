@@ -86,10 +86,10 @@ function StudioLayout() {
       </div>
 
       {/* Main Layout */}
-      <div className="relative z-10 flex w-full h-[calc(100vh-24px)] pt-[104px] px-6 gap-6 max-w-[2000px] mx-auto overflow-hidden">
+      <div className="relative z-10 flex flex-col lg:flex-row w-full h-auto lg:h-[calc(100vh-24px)] min-h-screen lg:min-h-0 pt-[104px] px-4 sm:px-6 gap-6 max-w-[2000px] mx-auto overflow-y-auto lg:overflow-hidden pb-12 lg:pb-0">
 
         {/* Left Panel - Tool Control */}
-        <div className="studio-panel w-[340px] shrink-0 h-[calc(100vh-130px)] flex flex-col z-20">
+        <div className="studio-panel w-full lg:w-[340px] shrink-0 h-[600px] lg:h-[calc(100vh-130px)] flex flex-col z-20 order-2 lg:order-1">
           <StudioLeftPanel
             onGenerate={handleGenerate}
             isGenerating={isGenerating}
@@ -100,7 +100,7 @@ function StudioLayout() {
         </div>
 
         {/* Center Panel - Creation Canvas (Hero) */}
-        <div className="studio-panel flex-1 h-full min-w-0 flex flex-col relative z-10">
+        <div className="studio-panel flex-1 h-[50vh] min-h-[400px] lg:h-full lg:min-h-0 min-w-0 flex flex-col relative z-10 order-1 lg:order-2">
           <StudioCenterCanvas
             activeGeneration={activeGeneration}
             mode={mode}

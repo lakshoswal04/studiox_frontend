@@ -93,7 +93,7 @@ export function CommunitySection() {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-4 mb-10">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-4 mb-10">
                     {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => {
                         const stylePrompts = [
                             "A beautiful surreal photography of a dreamscape, highly detailed, 8k resolution, cinematic lighting",
@@ -109,9 +109,9 @@ export function CommunitySection() {
                         const previewUrl = `https://picsum.photos/seed/${i + 100}/800/1000`;
 
                         return (
-                            <div key={i} className={`${i % 2 === 0 ? 'md:translate-y-8' : ''}`}>
+                            <div key={i} className={`${i % 2 === 0 ? 'sm:translate-y-4 md:translate-y-8' : ''}`}>
                                 <div className="community-card h-full">
-                                    <UnifiedCard className="aspect-[4/5] overflow-hidden group relative border-0 bg-secondary/50 backdrop-blur-sm hover:shadow-2xl transition-all duration-500">
+                                    <UnifiedCard className="aspect-[4/5] sm:aspect-auto sm:h-[400px] md:h-auto md:aspect-[4/5] w-full max-w-[400px] mx-auto overflow-hidden group relative border-0 bg-secondary/50 backdrop-blur-sm hover:shadow-2xl transition-all duration-500">
                                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10" />
 
                                         {/* Artistic Placeholder */}

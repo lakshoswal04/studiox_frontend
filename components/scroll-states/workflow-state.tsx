@@ -227,7 +227,7 @@ export function WorkflowState({ register }: WorkflowStateProps) {
     }, [register, mounted, images])
 
     return (
-        <section ref={containerRef} className="md:absolute md:inset-0 relative w-full h-auto min-h-[100svh] overflow-hidden bg-white">
+        <section ref={containerRef} className="md:absolute md:inset-0 relative w-full h-auto min-h-[70svh] md:min-h-[100svh] overflow-hidden bg-white">
 
             {/* 1. IMAGE LAYER - ONLY RENDER IF MOUNTED */}
             {mounted && (

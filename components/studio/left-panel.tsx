@@ -133,7 +133,7 @@ export function StudioLeftPanel({ onGenerate, isGenerating, mode: initialMode, a
                                             <ChevronDown className="w-3.5 h-3.5 text-zinc-500 group-hover:text-zinc-300 transition-colors" />
                                         </div>
                                     </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="start" sideOffset={8} className="z-50 w-[340px] bg-[#121217]/95 border border-white/[0.08] shadow-[0_30px_60px_rgba(0,0,0,0.9)] rounded-[20px] p-0 overflow-hidden backdrop-blur-3xl">
+                                    <DropdownMenuContent align="start" sideOffset={8} className="z-50 w-[calc(100vw-48px)] sm:w-[340px] bg-[#121217]/95 border border-white/[0.08] shadow-[0_30px_60px_rgba(0,0,0,0.9)] rounded-[20px] p-0 overflow-hidden backdrop-blur-3xl">
                                         <div className="max-h-[280px] overflow-y-auto p-2 custom-scrollbar space-y-0.5">
                                             {(creationMode === "video" ? AI_VIDEO_MODELS : AI_IMAGE_MODELS).map((model) => (
                                                 <DropdownMenuItem

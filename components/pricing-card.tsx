@@ -120,6 +120,7 @@ export function PricingCard({ plan, index = 0, billingCycle = "monthly" }: Prici
                 </span>
               ))}
             </div>
+
             <div className="relative h-1.5 w-full bg-white/[0.08] rounded-full">
               <div
                 className="absolute top-0 left-0 h-full bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full transition-all duration-300 pointer-events-none"
@@ -225,7 +226,7 @@ export function PricingCard({ plan, index = 0, billingCycle = "monthly" }: Prici
             {/* Overlapping Badge */}
             <div className="absolute -top-3 left-4 z-10 flex items-center gap-2">
               <span className="text-[11px] text-cyan-400 bg-[#042021] border border-cyan-500/20 px-2.5 py-1 rounded-md font-medium">
-                No reset · Rollover
+                Spend top-ups first
               </span>
             </div>
 
@@ -233,7 +234,7 @@ export function PricingCard({ plan, index = 0, billingCycle = "monthly" }: Prici
             <div className="pt-6 pb-4 px-4 rounded-xl bg-[#1a1f26] border border-white/[0.08] flex flex-col gap-4 transition-colors hover:bg-[#1a1f26]/80">
               {/* Monthly Credit info */}
               <div className="flex flex-col gap-1">
-                <span className="text-sm font-medium text-zinc-300">Monthly Credit</span>
+                <span className="text-sm font-medium text-zinc-300">Monthly Credit <span className="text-[11px] font-normal text-zinc-500 ml-1">(No rollover)</span></span>
                 <div className="flex items-baseline gap-1.5 mt-1">
                   <span className="text-3xl font-bold text-white tracking-tight">
                     <AnimatePresence mode="popLayout">
@@ -259,8 +260,8 @@ export function PricingCard({ plan, index = 0, billingCycle = "monthly" }: Prici
               <div className="flex flex-col gap-1">
                 <span className="text-xs font-medium text-zinc-400">Next top-up</span>
                 <div className="flex items-baseline gap-1.5 mt-0.5">
-                  <span className="text-xl font-bold text-white tracking-tight">$1=100</span>
-                  <span className="text-sm font-medium text-zinc-400">Credits</span>
+                  <span className="text-xl font-bold text-white tracking-tight">$1=200</span>
+                  <span className="text-sm font-medium text-zinc-400">Credits <span className="text-[11px] ml-1 text-emerald-500/80">(Never expire)</span></span>
                 </div>
               </div>
             </div>

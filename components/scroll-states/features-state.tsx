@@ -177,8 +177,22 @@ export function FeaturesState({ register }: FeaturesStateProps) {
         return () => unregister && unregister()
     }, [register, started])
 
+    // Mobile Fallback: Start typewriter when in view
+    useEffect(() => {
+        if (window.innerWidth < 768 && containerRef.current) {
+            const observer = new IntersectionObserver((entries) => {
+                if (entries[0].isIntersecting) {
+                    setStarted(true)
+                    observer.disconnect()
+                }
+            }, { threshold: 0.2 })
+            observer.observe(containerRef.current)
+            return () => observer.disconnect()
+        }
+    }, [])
+
     return (
-        <section ref={containerRef} className="md:absolute md:inset-0 relative w-full h-auto min-h-[100svh] flex flex-col items-center justify-center overflow-hidden bg-black">
+        <section ref={containerRef} className="md:absolute md:inset-0 relative w-full h-auto min-h-[100svh] flex flex-col items-center justify-start md:justify-center overflow-hidden bg-black">
 
             {/* VIDEO BACKGROUND WITH PARALLAX */}
             <div className="absolute inset-0 w-full h-full z-0 pointer-events-none overflow-hidden">
@@ -200,12 +214,12 @@ export function FeaturesState({ register }: FeaturesStateProps) {
 
 
             {/* Content Container */}
-            <div className="relative z-10 w-full max-w-7xl mx-auto h-full flex flex-col md:flex-row items-center justify-between p-8 md:p-20">
+            <div className="relative z-10 w-full max-w-7xl mx-auto h-full flex flex-col md:flex-row items-center justify-start md:justify-between p-8 pt-32 md:p-20">
 
                 {/* Left Side: Typography */}
                 <div className="flex-1 space-y-8 md:pr-12 pointer-events-none z-20 text-center md:text-left">
                     <div className="space-y-4">
-                        <h2 className="text-5xl md:text-7xl font-semibold font-sans tracking-tighter text-white drop-shadow-2xl">
+                        <h2 className="text-4xl sm:text-5xl md:text-7xl font-semibold font-sans tracking-tighter text-white drop-shadow-2xl">
                             <Typewriter
                                 text="Capabilities"
                                 delay={100}
@@ -228,12 +242,12 @@ export function FeaturesState({ register }: FeaturesStateProps) {
                 </div>
 
                 {/* Right Side: Card Stack */}
-                <div ref={cardsContainerRef} className="flex-1 relative w-full md:h-[500px] h-auto flex flex-col md:flex-row items-center justify-center md:-ml-0 mt-8 md:mt-0">
+                <div ref={cardsContainerRef} className="flex-1 relative w-full md:h-[500px] h-auto flex flex-col md:flex-row items-center justify-center md:-ml-0 mt-8 md:mt-0 pb-20">
                     {FEATURES.map((feature, i) => (
                         <div
                             key={i}
                             ref={(el) => { cardsRef.current[i] = el }}
-                            className="relative md:absolute w-full md:w-[480px] h-[320px] mb-6 md:mb-0 will-change-transform"
+                            className="relative md:absolute w-full max-w-[400px] md:max-w-none md:w-[480px] h-[320px] mb-6 md:mb-0 will-change-transform"
                         >
                             {/* Glass Card Wrapper */}
                             <div className="h-full w-full bg-zinc-950/90 border border-white/10 rounded-2xl shadow-2xl overflow-hidden relative group">
