@@ -31,13 +31,6 @@ const pricingPlans: PricingPlan[] = [
     queuePriority: "Standard",
     support: "Email",
     bestFor: "Casual creators",
-    tiers: [
-      { credits: 5800, price: 29, yearlyPrice: 278 },
-      { credits: 8000, price: 39, yearlyPrice: 374 },
-      { credits: 11000, price: 54, yearlyPrice: 518 },
-      { credits: 14000, price: 68, yearlyPrice: 652 },
-      { credits: 18000, price: 87, yearlyPrice: 835 },
-    ],
   },
   {
     id: "pro",
@@ -95,13 +88,6 @@ const pricingPlans: PricingPlan[] = [
     queuePriority: "Priority",
     support: "Priority Email",
     bestFor: "Agencies & power users",
-    tiers: [
-      { credits: 50000, price: 199, yearlyPrice: 1910 },
-      { credits: 75000, price: 289, yearlyPrice: 2774 },
-      { credits: 100000, price: 379, yearlyPrice: 3638 },
-      { credits: 150000, price: 559, yearlyPrice: 5366 },
-      { credits: 200000, price: 739, yearlyPrice: 7094 },
-    ],
   },
 ]
 

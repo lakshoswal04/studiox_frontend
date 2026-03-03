@@ -28,6 +28,9 @@ interface StudioLeftPanelProps {
     mode: "image" | "video" | "templates";
     aspectRatio: string;
     setAspectRatio: (val: string) => void;
+    initialPrompt?: string;
+    initialPreviewUrl?: string;
+    initialSourceId?: string;
 }
 
 const AI_IMAGE_MODELS = [
@@ -54,10 +57,10 @@ const AI_VIDEO_MODELS = [
     { id: "wan-animate", name: "Wan Animate API" },
 ];
 
-export function StudioLeftPanel({ onGenerate, isGenerating, mode: initialMode, aspectRatio, setAspectRatio }: StudioLeftPanelProps) {
-    const [creationMode, setCreationMode] = useState<string>("image");
-    const [prompt, setPrompt] = useState("");
-    const [previewUrl, setPreviewUrl] = useState("");
+export function StudioLeftPanel({ onGenerate, isGenerating, mode: initialMode, aspectRatio, setAspectRatio, initialPrompt, initialPreviewUrl, initialSourceId }: StudioLeftPanelProps) {
+    const [creationMode, setCreationMode] = useState<string>(initialMode);
+    const [prompt, setPrompt] = useState(initialPrompt || "");
+    const [previewUrl, setPreviewUrl] = useState(initialPreviewUrl || "");
 
     const [selectedModel, setSelectedModel] = useState(AI_IMAGE_MODELS[0]);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -90,6 +93,14 @@ export function StudioLeftPanel({ onGenerate, isGenerating, mode: initialMode, a
                 {/* Inner Wrapper for proper layout spacing with absolute inset to secure scroll boundaries */}
                 <div className="absolute inset-0 overflow-y-auto overflow-x-hidden custom-scrollbar">
                     <div className="p-6 pb-12 flex flex-col gap-6 w-full">
+
+                        {/* Remix Context Chip */}
+                        {initialSourceId && (
+                            <div className="flex items-center gap-2 px-3 py-2 bg-purple-500/10 border border-purple-500/20 rounded-xl animate-in fade-in slide-in-from-top-2 duration-300">
+                                <div className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse" />
+                                <span className="text-[11px] font-medium text-purple-300 truncate">Remixing from community post</span>
+                            </div>
+                        )}
 
                         {/* 1. CREATION MODE SWITCH */}
                         <div className="flex p-1 bg-black/40 backdrop-blur-md rounded-[16px] border border-white/[0.04] shadow-inner relative shrink-0">

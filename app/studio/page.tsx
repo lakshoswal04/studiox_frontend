@@ -7,6 +7,8 @@ import { StudioCenterCanvas, type GenerationItem } from "@/components/studio/cen
 import { Loader2 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import gsap from "gsap";
+import { createRemixPost } from "@/lib/community-store";
+import { toast } from "sonner";
 
 export default function StudioPage() {
   return (
@@ -45,6 +47,9 @@ function StudioLayout() {
   const handleGenerate = async (prompt: string, settings: any) => {
     setIsGenerating(true);
 
+    // Capture sourceId early to avoid stale closure in setTimeout
+    const sourceId = searchParams.get("sourceId") || undefined;
+
     // Simulate generation queue
     const newItem: GenerationItem = {
       id: crypto.randomUUID(),
@@ -63,12 +68,22 @@ function StudioLayout() {
       setGenerations((prev: GenerationItem[]) => prev.map(item => item.id === newItem.id ? { ...item, status: "generating" } : item));
     }, 1500);
 
-    // Simulate completion
+    // Simulate completion + auto-publish
     setTimeout(() => {
-      const completedItem: GenerationItem = { ...newItem, status: "completed" as const, src: settings.mode === 'image' ? "/createcard.jpeg" : "/studiox.jpg" };
+      const resultSrc = settings.mode === 'image' ? "/createcard.jpeg" : "/studiox.jpg";
+      const completedItem: GenerationItem = { ...newItem, status: "completed" as const, src: resultSrc };
       setActiveGeneration(completedItem);
       setGenerations((prev: GenerationItem[]) => prev.map(item => item.id === newItem.id ? completedItem : item));
       setIsGenerating(false);
+
+      // Auto-publish to community feed with lineage
+      createRemixPost({
+        prompt,
+        type: settings.mode === 'video' ? 'video' : 'image',
+        assetUrl: resultSrc,
+        parentAssetId: sourceId,
+      });
+      toast.success("Published to Community!", { duration: 3000 });
     }, 4500);
   };
 
@@ -96,6 +111,9 @@ function StudioLayout() {
             mode={mode}
             aspectRatio={aspectRatio}
             setAspectRatio={setAspectRatio}
+            initialPrompt={searchParams.get("prompt") || ""}
+            initialPreviewUrl={searchParams.get("previewUrl") || ""}
+            initialSourceId={searchParams.get("sourceId") || ""}
           />
         </div>
 

@@ -2,7 +2,7 @@
 
 import { useRef, useLayoutEffect, useEffect, useState, useMemo, useCallback } from "react"
 import { Button } from "@/components/ui/button"
-import { Sparkles, ArrowRight, Play, Plus, Layers, Grid3X3, Type, Pen, Image, Wand2 } from "lucide-react"
+import { Sparkles, ArrowRight, Play } from "lucide-react"
 import { Typewriter } from "@/components/ui/typewriter"
 import { gsap } from "gsap"
 
@@ -36,11 +36,11 @@ interface FloatConfig {
 }
 
 // Wireframe connections: [fromCard, toCard, color, label]
+// We use a neutral hex color matching the reference image and remove labels.
 const CONNECTIONS: [string, string, string, string][] = [
-    ['prompt', 'imageGen', '#3b82f6', 'Generate'],
-    ['reference', 'imageGen', '#06b6d4', 'Style'],
-    ['imageGen', 'videoGen', '#a855f7', 'Animate'],
-    ['prompt', 'reference', '#f43f5e', 'Guide'],
+    ['reference', 'imageGen', '#a1a1aa', ''],
+    ['imageGen', 'videoGen', '#a1a1aa', ''],
+    ['imageGen', 'prompt', '#a1a1aa', ''],
 ]
 
 export function HeroState({ register }: HeroStateProps) {
@@ -67,11 +67,23 @@ export function HeroState({ register }: HeroStateProps) {
 
     // Initial positions (percentage of canvas inner)
     const [positions, setPositions] = useState<Record<string, { x: number; y: number }>>({
-        prompt: { x: 68, y: 5 },
-        reference: { x: 3, y: 15 },
-        imageGen: { x: 28, y: 15 },
-        videoGen: { x: 62, y: 55 },
+        reference: { x: 5, y: 25 },
+        imageGen: { x: 35, y: 5 },
+        videoGen: { x: 30, y: 50 },
+        prompt: { x: 65, y: 35 },
     })
+
+    useEffect(() => {
+        setMounted(true)
+        if (window.innerWidth < 768) {
+            setPositions({
+                reference: { x: 2, y: 30 },
+                imageGen: { x: 45, y: 5 },
+                videoGen: { x: 25, y: 55 },
+                prompt: { x: 70, y: 35 },
+            })
+        }
+    }, [])
 
     const floats = useMemo<FloatConfig[]>(() => {
         if (typeof window === 'undefined') return []
@@ -92,7 +104,7 @@ export function HeroState({ register }: HeroStateProps) {
         return items
     }, [])
 
-    useEffect(() => setMounted(true), [])
+    // mounted check handled in initial positions effect
 
     // ---- Drag logic ----
     const handlePointerDown = useCallback((cardId: string, e: React.PointerEvent) => {
@@ -217,12 +229,7 @@ export function HeroState({ register }: HeroStateProps) {
         return () => unregister?.()
     }, [register])
 
-    const toolbarIcons = [
-        { icon: Plus, label: "Add" }, { icon: Layers, label: "Layers" },
-        { icon: Grid3X3, label: "Grid" }, { icon: Type, label: "Text" },
-        { icon: Pen, label: "Draw" }, { icon: Image, label: "Media" },
-        { icon: Wand2, label: "AI" },
-    ]
+
 
     // Compute wire paths for current card positions
     const wirePaths = useMemo(() => {
@@ -232,20 +239,14 @@ export function HeroState({ register }: HeroStateProps) {
             if (!edge) return null
             const { x1, y1, x2, y2 } = edge
             const dx = x2 - x1, dy = y2 - y1
-            const len = Math.sqrt(dx * dx + dy * dy)
-            // Control points for Bezier curve (curvy wire)
-            const cp1x = x1 + dx * 0.35 + dy * 0.15
-            const cp1y = y1 + dy * 0.35 - dx * 0.15
-            const cp2x = x1 + dx * 0.65 - dy * 0.15
-            const cp2y = y1 + dy * 0.65 + dx * 0.15
-            // Arrow endpoint (slightly before the end so arrowhead sits at edge)
-            const arrowLen = 10
-            const ux = dx / len, uy = dy / len
-            const ax = x2 - ux * arrowLen, ay = y2 - uy * arrowLen
-            // Mid point for label
-            const mx = (x1 + x2) / 2 + dy * 0.08
-            const my = (y1 + y2) / 2 - dx * 0.08
-            return { x1, y1, x2, y2, cp1x, cp1y, cp2x, cp2y, ax, ay, ux, uy, mx, my, color, label, len }
+
+            // Adjust bezier control points to be more "s-curve" like the reference
+            const cp1x = x1 + dx * 0.5
+            const cp1y = y1
+            const cp2x = x1 + dx * 0.5
+            const cp2y = y2
+
+            return { x1, y1, x2, y2, cp1x, cp1y, cp2x, cp2y, color, label }
         }).filter(Boolean) as any[]
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [mounted, wireUpdate, getCardEdge])
@@ -320,48 +321,37 @@ export function HeroState({ register }: HeroStateProps) {
                     </div>
                 </div>
 
-                {/* ========= GLASS CANVAS ========= */}
+                {/* ========= DARK GLASS CANVAS ========= */}
                 <div ref={canvasRef} className="relative rounded-2xl overflow-hidden pointer-events-auto"
                     style={{
                         opacity: 0,
-                        background: 'rgba(255,255,255,0.22)',
-                        backdropFilter: 'blur(28px) saturate(1.5)',
-                        WebkitBackdropFilter: 'blur(28px) saturate(1.5)',
-                        border: '1px solid rgba(255,255,255,0.5)',
-                        boxShadow: '0 20px 80px -15px rgba(99,102,241,0.12), 0 8px 30px -10px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.7)',
+                        background: 'rgba(10,10,12,0.92)',
+                        backdropFilter: 'blur(28px) saturate(1.3)',
+                        WebkitBackdropFilter: 'blur(28px) saturate(1.3)',
+                        border: '1px solid rgba(255,255,255,0.08)',
+                        boxShadow: '0 25px 80px -15px rgba(0,0,0,0.5), 0 8px 30px -10px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)',
                     }}>
 
-                    {/* Glass grain */}
-                    <div className="absolute inset-0 pointer-events-none opacity-[0.025]"
-                        style={{ backgroundImage: 'radial-gradient(circle, rgba(0,0,0,0.5) 1px, transparent 1px)', backgroundSize: '18px 18px' }} />
+                    {/* Dark dot grid */}
+                    <div className="absolute inset-0 pointer-events-none opacity-[0.15]"
+                        style={{ backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.3) 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
 
-                    {/* Toolbar */}
-                    <div className="absolute left-3 top-1/2 -translate-y-1/2 z-30 flex flex-col gap-1.5">
-                        {toolbarIcons.map(({ icon: Icon, label }, i) => (
-                            <div key={i} title={label}
-                                className="w-9 h-9 rounded-lg flex items-center justify-center text-zinc-400 hover:text-zinc-700 transition-all cursor-pointer group"
-                                style={{ background: 'rgba(255,255,255,0.5)', backdropFilter: 'blur(12px)', border: '1px solid rgba(0,0,0,0.06)', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-                                <Icon className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                            </div>
-                        ))}
-                        <div className="w-9 h-9 rounded-lg bg-gradient-to-tr from-indigo-500 to-purple-500 mt-1 shadow-md cursor-pointer hover:scale-105 transition-transform" />
-                    </div>
+                    {/* Subtle warm glow behind cards */}
+                    <div className="absolute top-[20%] left-[30%] w-[300px] h-[200px] rounded-full pointer-events-none opacity-[0.06] blur-[60px]"
+                        style={{ background: 'radial-gradient(circle, #f97316 0%, transparent 70%)' }} />
+                    <div className="absolute bottom-[20%] right-[20%] w-[250px] h-[250px] rounded-full pointer-events-none opacity-[0.04] blur-[50px]"
+                        style={{ background: 'radial-gradient(circle, #c084fc 0%, transparent 70%)' }} />
 
                     {/* Canvas area */}
-                    <div ref={canvasInnerRef} className="relative py-8 px-16 min-h-[380px] md:min-h-[440px]" style={{ cursor: dragging ? 'grabbing' : 'default' }}>
+                    <div ref={canvasInnerRef} className="relative py-8 px-5 md:px-16 min-h-[380px] md:min-h-[440px]" style={{ cursor: dragging ? 'grabbing' : 'default' }}>
 
-                        {/* SVG WIRES with arrows */}
+                        {/* SVG WIRES */}
                         <svg className="absolute inset-0 w-full h-full pointer-events-none z-10" style={{ overflow: 'visible' }}>
                             <defs>
                                 {CONNECTIONS.map(([, , color], i) => (
-                                    <marker key={`arrow-${i}`} id={`arrowhead-${i}`} markerWidth="14" markerHeight="10" refX="12" refY="5" orient="auto" markerUnits="userSpaceOnUse">
-                                        <polygon points="0 0, 14 5, 0 10" fill={color} opacity="0.9" />
-                                    </marker>
-                                ))}
-                                {CONNECTIONS.map(([, , color], i) => (
                                     <filter key={`glow-${i}`} id={`wire-glow-${i}`} x="-50%" y="-50%" width="200%" height="200%">
-                                        <feGaussianBlur stdDeviation="4" result="blur" />
-                                        <feFlood floodColor={color} floodOpacity="0.6" result="color" />
+                                        <feGaussianBlur stdDeviation="2" result="blur" />
+                                        <feFlood floodColor={color} floodOpacity="0.3" result="color" />
                                         <feComposite in="color" in2="blur" operator="in" result="glow" />
                                         <feMerge>
                                             <feMergeNode in="glow" />
@@ -374,42 +364,19 @@ export function HeroState({ register }: HeroStateProps) {
                                 const pathD = `M ${w.x1} ${w.y1} C ${w.cp1x} ${w.cp1y}, ${w.cp2x} ${w.cp2y}, ${w.x2} ${w.y2}`
                                 return (
                                     <g key={i}>
-                                        {/* Wide soft glow */}
-                                        <path d={pathD} stroke={w.color} strokeWidth="12" fill="none" opacity="0.06" strokeLinecap="round" />
-                                        {/* Medium glow */}
-                                        <path d={pathD} stroke={w.color} strokeWidth="5" fill="none" opacity="0.15" strokeLinecap="round" />
-                                        {/* Main animated wire */}
-                                        <path d={pathD} stroke={w.color} strokeWidth="2" fill="none" opacity="0.7"
-                                            strokeDasharray="10 6" strokeLinecap="round"
-                                            markerEnd={`url(#arrowhead-${i})`}
-                                            filter={`url(#wire-glow-${i})`}
-                                        >
-                                            <animate attributeName="stroke-dashoffset" from="0" to="-32" dur="1s" repeatCount="indefinite" />
-                                        </path>
-                                        {/* Traveling particle */}
-                                        <circle r="3" fill={w.color} opacity="0.9" filter={`url(#wire-glow-${i})`}>
-                                            <animateMotion dur="2.5s" repeatCount="indefinite">
+                                        {/* Subtle elegant line */}
+                                        <path d={pathD} stroke={w.color} strokeWidth="1.5" fill="none" opacity="0.6" strokeLinecap="round" filter={`url(#wire-glow-${i})`} />
+                                        {/* Animated traveling particle */}
+                                        <circle r="2" fill="#e4e4e7" opacity="0.8">
+                                            <animateMotion dur="3s" repeatCount="indefinite">
                                                 <mpath href={`#motion-path-${i}`} />
                                             </animateMotion>
                                         </circle>
                                         <path id={`motion-path-${i}`} d={pathD} fill="none" stroke="none" />
-                                        {/* Start dot */}
-                                        <circle cx={w.x1} cy={w.y1} r="4" fill={w.color} opacity="0.7">
-                                            <animate attributeName="r" values="3;6;3" dur="1.5s" repeatCount="indefinite" />
-                                            <animate attributeName="opacity" values="0.7;1;0.7" dur="1.5s" repeatCount="indefinite" />
-                                        </circle>
-                                        {/* End dot */}
-                                        <circle cx={w.x2} cy={w.y2} r="4" fill={w.color} opacity="0.7">
-                                            <animate attributeName="r" values="3;5;3" dur="2s" repeatCount="indefinite" />
-                                            <animate attributeName="opacity" values="0.5;0.9;0.5" dur="2s" repeatCount="indefinite" />
-                                        </circle>
-                                        {/* Label on wire */}
-                                        {w.len > 80 && (
-                                            <g>
-                                                <rect x={w.mx - 24} y={w.my - 10} width="48" height="20" rx="10" fill="white" fillOpacity="0.9" stroke={w.color} strokeWidth="1" strokeOpacity="0.4" />
-                                                <text x={w.mx} y={w.my + 4} textAnchor="middle" fill={w.color} fontSize="9" fontWeight="700" fontFamily="system-ui">{w.label}</text>
-                                            </g>
-                                        )}
+                                        {/* Start point */}
+                                        {/*<circle cx={w.x1} cy={w.y1} r="2.5" fill={w.color} opacity="0.8" />*/}
+                                        {/* End point */}
+                                        {/*<circle cx={w.x2} cy={w.y2} r="2.5" fill={w.color} opacity="0.8" />*/}
                                     </g>
                                 )
                             })}
@@ -417,36 +384,18 @@ export function HeroState({ register }: HeroStateProps) {
 
                         {/* === DRAGGABLE CARDS === */}
 
-                        {/* Prompt Card */}
-                        <div
-                            ref={el => { cardRefs.current.prompt = el }}
-                            className="absolute z-20 select-none group"
-                            style={{ left: `${positions.prompt.x}%`, top: `${positions.prompt.y}%`, cursor: dragging === 'prompt' ? 'grabbing' : 'grab' }}
-                            onPointerDown={e => handlePointerDown('prompt', e)}
-                        >
-                            <div className="px-4 py-3 rounded-xl max-w-[200px] transition-all duration-200 group-hover:shadow-xl group-active:scale-[0.97]"
-                                style={{ background: 'rgba(255,255,255,0.65)', backdropFilter: 'blur(16px)', border: '1.5px solid rgba(129,140,248,0.25)', boxShadow: '0 4px 20px rgba(129,140,248,0.1)' }}>
-                                <div className="text-[10px] text-indigo-500 uppercase tracking-wider mb-1.5 font-bold flex items-center gap-1.5">
-                                    <div className="w-2 h-2 rounded-full bg-indigo-400 shadow-[0_0_6px_rgba(129,140,248,0.5)]" /> Prompt
-                                </div>
-                                <p className="text-[11px] text-zinc-600 leading-relaxed">
-                                    A cinematic scene with flowing golden fabric, ethereal lighting…
-                                </p>
-                            </div>
-                        </div>
-
                         {/* Reference Card */}
                         <div
                             ref={el => { cardRefs.current.reference = el }}
-                            className="absolute z-20 select-none group"
+                            className="absolute z-20 select-none group touch-none"
                             style={{ left: `${positions.reference.x}%`, top: `${positions.reference.y}%`, cursor: dragging === 'reference' ? 'grabbing' : 'grab' }}
                             onPointerDown={e => handlePointerDown('reference', e)}
                         >
-                            <div className="text-[10px] text-sky-500 uppercase tracking-wider mb-1.5 font-bold flex items-center gap-1.5">
-                                <div className="w-2 h-2 rounded-full bg-sky-400 shadow-[0_0_6px_rgba(56,189,248,0.5)]" /> Reference
+                            <div className="text-[11px] md:text-[12px] text-zinc-400 mb-2 md:mb-2 font-medium flex items-center gap-1.5 px-1">
+                                Reference
                             </div>
-                            <div className="w-[180px] h-[140px] rounded-xl overflow-hidden transition-all duration-200 group-hover:shadow-xl group-active:scale-[0.97]"
-                                style={{ border: '1.5px solid rgba(56,189,248,0.2)', boxShadow: '0 4px 20px rgba(56,189,248,0.08)' }}>
+                            <div className="w-[100px] md:w-[150px] h-[75px] md:h-[110px] rounded-xl overflow-hidden transition-all duration-200 group-hover:shadow-[0_0_30px_rgba(255,255,255,0.08)] group-active:scale-[0.97]"
+                                style={{ border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 4px 20px rgba(0,0,0,0.3)' }}>
                                 <img src="/seamless-animate/bg3.jpg" alt="" className="w-full h-full object-cover" />
                             </div>
                         </div>
@@ -454,15 +403,15 @@ export function HeroState({ register }: HeroStateProps) {
                         {/* Image Generation Card */}
                         <div
                             ref={el => { cardRefs.current.imageGen = el }}
-                            className="absolute z-20 select-none group"
+                            className="absolute z-20 select-none group touch-none"
                             style={{ left: `${positions.imageGen.x}%`, top: `${positions.imageGen.y}%`, cursor: dragging === 'imageGen' ? 'grabbing' : 'grab' }}
                             onPointerDown={e => handlePointerDown('imageGen', e)}
                         >
-                            <div className="text-[10px] text-purple-500 uppercase tracking-wider mb-1.5 font-bold flex items-center gap-1.5">
-                                <div className="w-2 h-2 rounded-full bg-purple-400 shadow-[0_0_6px_rgba(192,132,252,0.5)]" /> Image Generation
+                            <div className="text-[11px] md:text-[12px] text-zinc-400 mb-2 md:mb-2 font-medium flex items-center gap-1.5 px-1 w-full justify-center">
+                                Image Generation
                             </div>
-                            <div className="w-[260px] md:w-[300px] h-[190px] md:h-[220px] rounded-xl overflow-hidden transition-all duration-200 group-hover:shadow-2xl group-active:scale-[0.97]"
-                                style={{ border: '1.5px solid rgba(192,132,252,0.2)', boxShadow: '0 8px 30px rgba(192,132,252,0.1)' }}>
+                            <div className="w-[140px] md:w-[200px] h-[100px] md:h-[140px] rounded-xl overflow-hidden transition-all duration-200 group-hover:shadow-[0_0_40px_rgba(255,255,255,0.08)] group-active:scale-[0.97]"
+                                style={{ border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 8px 30px rgba(0,0,0,0.4)', margin: '0 auto' }}>
                                 <img src="/seamless-animate/bg1.jpg" alt="" className="w-full h-full object-cover" />
                             </div>
                         </div>
@@ -470,15 +419,15 @@ export function HeroState({ register }: HeroStateProps) {
                         {/* Video Generation Card */}
                         <div
                             ref={el => { cardRefs.current.videoGen = el }}
-                            className="absolute z-20 select-none group"
+                            className="absolute z-20 select-none group touch-none"
                             style={{ left: `${positions.videoGen.x}%`, top: `${positions.videoGen.y}%`, cursor: dragging === 'videoGen' ? 'grabbing' : 'grab' }}
                             onPointerDown={e => handlePointerDown('videoGen', e)}
                         >
-                            <div className="text-[10px] text-pink-500 uppercase tracking-wider mb-1.5 font-bold flex items-center gap-1.5">
-                                <div className="w-2 h-2 rounded-full bg-pink-400 shadow-[0_0_6px_rgba(244,114,182,0.5)]" /> Video Generation
+                            <div className="text-[11px] md:text-[12px] text-zinc-400 mb-2 md:mb-2 font-medium flex items-center gap-1.5 px-1">
+                                Video Generation
                             </div>
-                            <div className="w-[200px] h-[150px] rounded-xl overflow-hidden transition-all duration-200 group-hover:shadow-xl group-active:scale-[0.97]"
-                                style={{ border: '1.5px solid rgba(244,114,182,0.2)', boxShadow: '0 4px 20px rgba(244,114,182,0.08)' }}>
+                            <div className="w-[140px] md:w-[200px] h-[100px] md:h-[140px] rounded-xl overflow-hidden transition-all duration-200 group-hover:shadow-[0_0_30px_rgba(255,255,255,0.08)] group-active:scale-[0.97]"
+                                style={{ border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 4px 20px rgba(0,0,0,0.3)' }}>
                                 <video
                                     src="/pinterest_video.mp4"
                                     autoPlay
@@ -489,21 +438,33 @@ export function HeroState({ register }: HeroStateProps) {
                                 />
                             </div>
                         </div>
-                    </div>
 
-                    {/* Bottom bar */}
-                    <div className="relative z-10 flex items-center justify-between px-6 py-3"
-                        style={{ borderTop: '1px solid rgba(0,0,0,0.04)', background: 'rgba(255,255,255,0.3)', backdropFilter: 'blur(12px)' }}>
-                        <div className="flex items-center gap-3">
-                            <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.6)', border: '1px solid rgba(0,0,0,0.06)' }}>
-                                <span className="text-[8px] text-zinc-400">◎</span>
+                        {/* Poem Card (small text card) */}
+                        <div
+                            ref={el => { cardRefs.current.prompt = el }}
+                            className="absolute z-20 select-none group touch-none flex flex-col items-start gap-2"
+                            style={{ left: `${positions.prompt.x}%`, top: `${positions.prompt.y}%`, cursor: dragging === 'prompt' ? 'grabbing' : 'grab' }}
+                            onPointerDown={e => handlePointerDown('prompt', e)}
+                        >
+                            <div className="text-[11px] md:text-[12px] text-zinc-400 font-medium px-2">
+                                Prompt
                             </div>
-                            <span className="text-[11px] text-zinc-400">Canvas • 1920 × 1080</span>
-                            <span className="text-[10px] text-zinc-300 ml-2 italic">⟵ Drag any card</span>
+                            <div className="px-3 py-3 md:px-4 md:py-4 rounded-xl w-[120px] md:w-[150px] transition-all duration-200 group-hover:shadow-[0_0_20px_rgba(255,255,255,0.06)] group-active:scale-[0.97]"
+                                style={{ background: '#1c1c20', border: '1px solid rgba(255,255,255,0.06)', boxShadow: '0 4px 20px rgba(0,0,0,0.3)' }}>
+                                <p className="text-[10px] md:text-[11px] text-zinc-400 leading-snug font-light">
+                                    A woman dressed in flowing<br />golden fabric, eyes closed,<br />serene expression. Ethereal<br />lighting runs across, soft shadows<br />in shadowed.
+                                </p>
+                            </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <span className="text-[10px] text-zinc-400 px-2 py-1 rounded" style={{ background: 'rgba(255,255,255,0.6)', border: '1px solid rgba(0,0,0,0.06)' }}>Auto</span>
-                            <span className="text-[10px] text-zinc-400 px-2 py-1 rounded" style={{ background: 'rgba(255,255,255,0.6)', border: '1px solid rgba(0,0,0,0.06)' }}>HD</span>
+
+                        {/* Refresh / Regenerate button */}
+                        <div className="absolute bottom-6 left-6 md:bottom-8 md:left-8 z-30">
+                            <div className="w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center cursor-pointer hover:scale-105 transition-all duration-200 group"
+                                style={{ background: 'rgba(28,28,32,0.9)', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 4px 15px rgba(0,0,0,0.4)' }}>
+                                <svg className="w-4 h-4 md:w-5 md:h-5 text-zinc-400 group-hover:text-zinc-300 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                </svg>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -90,6 +90,7 @@ export interface CommunityPost {
   allowRemix: boolean
   createdAt: Date
   remixSourceId?: string // If this post is a remix of another
+  parentAssetId?: string // The asset ID this was remixed from (lineage tracking)
   type: "image" | "video"
   prompt: string
   tags: string[]

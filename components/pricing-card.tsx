@@ -271,7 +271,7 @@ export function PricingCard({ plan, index = 0, billingCycle = "monthly" }: Prici
         {/* Generation Estimates */}
         <div className="mb-6 rounded-xl bg-cyan-950/20 border border-cyan-500/10 p-3">
           <p className="text-[11px] text-cyan-200/70 leading-relaxed text-center font-medium">
-            Up to <strong className="text-cyan-300">~{Math.floor(activeCredits / 12).toLocaleString()}</strong> images | <strong className="text-cyan-300">~{Math.floor(activeCredits / 27).toLocaleString()}</strong> videos | <strong className="text-cyan-300">~{Math.floor(activeCredits / 60).toLocaleString()}</strong> music tracks | <strong className="text-cyan-300">~{Math.floor(activeCredits / 4).toLocaleString()}</strong> utility tasks
+            Up to <strong className="text-cyan-300">~{Math.floor(activeCredits / 12).toLocaleString()}</strong> GPT-4o | <strong className="text-cyan-300">~{Math.floor(activeCredits / 27).toLocaleString()}</strong> Seedance 1.5 | <strong className="text-cyan-300">~{Math.floor(activeCredits / 60).toLocaleString()}</strong> AI Music | <strong className="text-cyan-300">~{Math.floor(activeCredits / 300).toLocaleString()}</strong> Sora 2 Pro | <strong className="text-cyan-300">~{Math.floor(activeCredits / 4).toLocaleString()}</strong> Lyrics
           </p>
         </div>
 

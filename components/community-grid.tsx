@@ -1,31 +1,39 @@
 "use client"
 
-import { useEffect, useRef, useMemo } from "react"
+import { useEffect, useRef, useMemo, useState } from "react"
 import { gsap } from "gsap"
 import { CommunityPostCard } from "@/components/community-post-card"
-import { communityPosts } from "@/lib/community-data"
+import { getAllPosts, subscribeCommunityStore } from "@/lib/community-store"
 import { useSearchParams } from "next/navigation"
 
 export function CommunityGrid() {
     const gridRef = useRef<HTMLDivElement>(null)
     const searchParams = useSearchParams()
-    const hasAnimated = useRef(false)
+    const [posts, setPosts] = useState(getAllPosts)
 
     const tagFilter = searchParams.get("tag")
 
+    // Re-fetch when store changes (new user post published)
+    useEffect(() => {
+        const unsub = subscribeCommunityStore(() => setPosts(getAllPosts()))
+        return unsub
+    }, [])
+
     const filteredPosts = useMemo(() => {
-        if (!tagFilter) return communityPosts
-        return communityPosts.filter(post =>
+        if (!tagFilter) return posts
+        return posts.filter(post =>
             post.tags.some(tag => tag.toLowerCase() === tagFilter.toLowerCase())
         )
-    }, [tagFilter])
+    }, [tagFilter, posts])
 
     useEffect(() => {
-        if (hasAnimated.current) return
-        hasAnimated.current = true
-
         const cards = gridRef.current?.querySelectorAll<HTMLElement>(".community-card-inner")
         if (!cards || cards.length === 0) return
+
+        // Reset cards to initial hidden state
+        cards.forEach(card => {
+            gsap.set(card, { opacity: 0, y: 20 })
+        })
 
         // Simple staggered fade-in using IntersectionObserver
         const observer = new IntersectionObserver(
@@ -52,11 +60,6 @@ export function CommunityGrid() {
 
         return () => observer.disconnect()
     }, [filteredPosts])
-
-    // Reset animation tracking when tag changes
-    useEffect(() => {
-        hasAnimated.current = false
-    }, [tagFilter])
 
     if (filteredPosts.length === 0) {
         return (

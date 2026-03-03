@@ -2,13 +2,14 @@
 
 import { Button } from "@/components/ui/button"
 import type { CommunityPost } from "@/lib/types"
-import { Heart, Info, ChevronUp, ChevronDown, RefreshCw, Film, Download, Maximize2, Pencil } from "lucide-react"
+import { Heart, Info, ChevronUp, ChevronDown, RefreshCw, Film, Download, Maximize2, Pencil, GitBranch } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { useAuth } from "@/context/auth-context"
 import { useRouter } from "next/navigation"
 import { useState, useRef, useEffect, useCallback, memo } from "react"
 import { toast } from "sonner"
+import { getPostById } from "@/lib/community-store"
 
 interface CommunityPostCardProps {
   post: CommunityPost
@@ -60,13 +61,13 @@ export const CommunityPostCard = memo(function CommunityPostCard({ post, index }
 
   const handleRemix = useCallback((e: React.MouseEvent) => {
     e.preventDefault()
+    const target = `/studio?mode=${post.type}&prompt=${encodeURIComponent(post.prompt)}&previewUrl=${encodeURIComponent(post.assetUrl)}&sourceId=${encodeURIComponent(post.id)}`
     if (!user) {
-      const target = `/studio?mode=${post.type}&prompt=${encodeURIComponent(post.prompt)}`
       router.push(`/login?redirect=${encodeURIComponent(target)}`)
     } else {
-      router.push(`/studio?mode=${post.type}&prompt=${encodeURIComponent(post.prompt)}`)
+      router.push(target)
     }
-  }, [user, post.type, post.prompt, router])
+  }, [user, post.type, post.prompt, post.assetUrl, post.id, router])
 
   const handleLike = useCallback((e: React.MouseEvent) => {
     e.preventDefault()
@@ -75,13 +76,16 @@ export const CommunityPostCard = memo(function CommunityPostCard({ post, index }
   }, [])
 
   const navigateToStudio = useCallback((mode: string, prompt: string) => {
-    const target = `/studio?mode=${mode}&prompt=${encodeURIComponent(prompt)}&previewUrl=${encodeURIComponent(post.assetUrl)}`
+    const target = `/studio?mode=${mode}&prompt=${encodeURIComponent(prompt)}&previewUrl=${encodeURIComponent(post.assetUrl)}&sourceId=${encodeURIComponent(post.id)}`
     if (!user) {
       router.push(`/login?redirect=${encodeURIComponent(target)}`)
     } else {
       router.push(target)
     }
-  }, [user, post.assetUrl, router])
+  }, [user, post.assetUrl, post.id, router])
+
+  // Resolve remix source name
+  const remixSourcePost = post.remixSourceId ? getPostById(post.remixSourceId) : undefined
 
   const handleDownload = useCallback(async () => {
     try {
@@ -193,6 +197,14 @@ export const CommunityPostCard = memo(function CommunityPostCard({ post, index }
               </div>
             </div>
           </div>
+
+          {/* Remix Lineage Badge */}
+          {remixSourcePost && (
+            <div className="flex items-center gap-1.5 mt-1.5">
+              <GitBranch className="w-3 h-3 text-purple-400" />
+              <span className="text-[9px] text-purple-300 truncate">Remixed from {remixSourcePost.title}</span>
+            </div>
+          )}
         </div>
       </Link>
 

@@ -5,7 +5,7 @@ import { ArrowLeft, MoreHorizontal, Heart, Share2, Sparkles, Link as LinkIcon, I
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import Image from "next/image"
-import { communityPosts } from "@/lib/community-data"
+import { getPostById } from "@/lib/community-store"
 import { useAuth } from "@/context/auth-context"
 import { useRouter } from "next/navigation"
 import { useState, useCallback } from "react"
@@ -20,7 +20,7 @@ import { toast } from "sonner"
 export default function PostDetailPage() {
     const params = useParams()
     const postId = params.postId as string
-    const post = communityPosts.find(p => p.id === postId)
+    const post = getPostById(postId)
     const [isLiked, setIsLiked] = useState(false)
     const [isFollowing, setIsFollowing] = useState(false)
     const [showInfo, setShowInfo] = useState(true)
@@ -159,8 +159,8 @@ export default function PostDetailPage() {
                                 size="sm"
                                 variant={isFollowing ? "default" : "outline"}
                                 className={`rounded-full h-8 text-xs transition-all duration-200 ${isFollowing
-                                        ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 hover:bg-red-500/15 hover:text-red-400 hover:border-red-500/30"
-                                        : "border-white/10 bg-white/5 hover:bg-white/10"
+                                    ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 hover:bg-red-500/15 hover:text-red-400 hover:border-red-500/30"
+                                    : "border-white/10 bg-white/5 hover:bg-white/10"
                                     }`}
                                 onClick={() => {
                                     if (!user) {
@@ -303,10 +303,10 @@ export default function PostDetailPage() {
                             className="w-full h-12 rounded-xl bg-[#c8ff00] hover:bg-[#b8ef00] text-black font-semibold text-sm transition-all duration-200"
                             onClick={() => {
                                 if (!user) {
-                                    const target = `/studio?mode=${post.type}&prompt=${encodeURIComponent(post.prompt)}`
+                                    const target = `/studio?mode=${post.type}&prompt=${encodeURIComponent(post.prompt)}&previewUrl=${encodeURIComponent(post.assetUrl)}&sourceId=${encodeURIComponent(post.id)}`
                                     router.push(`/login?redirect=${encodeURIComponent(target)}`)
                                 } else {
-                                    router.push(`/studio?mode=${post.type}&prompt=${encodeURIComponent(post.prompt)}`)
+                                    router.push(`/studio?mode=${post.type}&prompt=${encodeURIComponent(post.prompt)}&previewUrl=${encodeURIComponent(post.assetUrl)}&sourceId=${encodeURIComponent(post.id)}`)
                                 }
                             }}
                         >
@@ -318,7 +318,7 @@ export default function PostDetailPage() {
                                 variant="outline"
                                 className="h-11 rounded-xl border-white/10 bg-white/[0.03] hover:bg-white/[0.08] text-zinc-300 text-sm"
                                 onClick={() => {
-                                    const target = `/studio?mode=video&prompt=${encodeURIComponent(post.prompt)}&previewUrl=${encodeURIComponent(post.assetUrl)}`
+                                    const target = `/studio?mode=video&prompt=${encodeURIComponent(post.prompt)}&previewUrl=${encodeURIComponent(post.assetUrl)}&sourceId=${encodeURIComponent(post.id)}`
                                     if (!user) {
                                         router.push(`/login?redirect=${encodeURIComponent(target)}`)
                                     } else {
@@ -360,7 +360,7 @@ export default function PostDetailPage() {
                                 className="h-11 rounded-xl border-white/10 bg-white/[0.03] hover:bg-white/[0.08] text-zinc-300 text-sm"
                                 onClick={() => {
                                     const upscalePrompt = `${post.prompt}, ultra high resolution 8k upscale, enhanced details, maximum quality`
-                                    const target = `/studio?mode=${post.type}&prompt=${encodeURIComponent(upscalePrompt)}&previewUrl=${encodeURIComponent(post.assetUrl)}`
+                                    const target = `/studio?mode=${post.type}&prompt=${encodeURIComponent(upscalePrompt)}&previewUrl=${encodeURIComponent(post.assetUrl)}&sourceId=${encodeURIComponent(post.id)}`
                                     if (!user) {
                                         router.push(`/login?redirect=${encodeURIComponent(target)}`)
                                     } else {
@@ -375,7 +375,7 @@ export default function PostDetailPage() {
                                 variant="outline"
                                 className="h-11 rounded-xl border-white/10 bg-white/[0.03] hover:bg-white/[0.08] text-zinc-300 text-sm"
                                 onClick={() => {
-                                    const target = `/studio?mode=${post.type}&prompt=${encodeURIComponent(post.prompt)}&previewUrl=${encodeURIComponent(post.assetUrl)}`
+                                    const target = `/studio?mode=${post.type}&prompt=${encodeURIComponent(post.prompt)}&previewUrl=${encodeURIComponent(post.assetUrl)}&sourceId=${encodeURIComponent(post.id)}`
                                     if (!user) {
                                         router.push(`/login?redirect=${encodeURIComponent(target)}`)
                                     } else {
@@ -404,10 +404,10 @@ export default function PostDetailPage() {
                                     className="w-full bg-white text-black hover:bg-zinc-200 rounded-xl h-12 text-base font-medium font-sans"
                                     onClick={() => {
                                         if (!user) {
-                                            const target = `/studio?mode=${post.type}&prompt=${encodeURIComponent(post.prompt)}`
+                                            const target = `/studio?mode=${post.type}&prompt=${encodeURIComponent(post.prompt)}&previewUrl=${encodeURIComponent(post.assetUrl)}&sourceId=${encodeURIComponent(post.id)}`
                                             router.push(`/login?redirect=${encodeURIComponent(target)}`)
                                         } else {
-                                            router.push(`/studio?mode=${post.type}&prompt=${encodeURIComponent(post.prompt)}`)
+                                            router.push(`/studio?mode=${post.type}&prompt=${encodeURIComponent(post.prompt)}&previewUrl=${encodeURIComponent(post.assetUrl)}&sourceId=${encodeURIComponent(post.id)}`)
                                         }
                                     }}
                                 >
